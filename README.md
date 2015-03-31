@@ -23,7 +23,7 @@ Optional options:
 * debug
 * value
 
-`
+```
 [DEFAULT]
 # access id obtains from aliyun
 access_id=
@@ -45,7 +45,7 @@ id=
 value=
 # resolve type, 'A', 'MX'...
 type=
-`
+```
 
 ### GETTING STARTED 
 1. Create a subdomain on net.cn manually, e,g: blog
