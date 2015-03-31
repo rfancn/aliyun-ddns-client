@@ -1,5 +1,6 @@
-# aliyun-ddns-client
-Python DDNS client for Aliyun
+## aliyun-ddns-client
+
+Python DDNS client for Aliyun(http://www.guanxigo.com/netcn-ddns-client/)
 
 ### INSTALLATION 
 1. copy all files to somewhere, e,g: /opt/aliyun-ddns-client
@@ -23,7 +24,7 @@ Optional options:
 * debug
 * value
 
-`
+```
 [DEFAULT]
 # access id obtains from aliyun
 access_id=
@@ -45,7 +46,7 @@ id=
 value=
 # resolve type, 'A', 'MX'...
 type=
-`
+```
 
 ### GETTING STARTED 
 1. Create a subdomain on net.cn manually, e,g: blog
