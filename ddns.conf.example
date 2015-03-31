@@ -1,0 +1,21 @@
+[DEFAULT]
+# Required: access id obtains from aliyun
+access_id=f8aLuQFAMUf4JMMW
+# Required: access key obtains from aliyun
+access_key=XgsrdxWKJcZdL7x2GDOda7YxvmHvj8
+# Optional: not used now 
+interval=600
+# Optional: turn on debug mode or not
+debug=true
+
+[DomainRecord1]
+# Required: domain name, like google.com
+domain=
+# Required: subdomain name, like www, blog, bbs
+sub_domain=
+# Required: resolve type, 'A', 'MX'...
+type=
+# Optional: record id which get from DNS service provider
+id=
+# Optional: it can be IP address or alias to another hostname...
+value=
