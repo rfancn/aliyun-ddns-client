@@ -156,6 +156,10 @@ class YunResolver(object):
             r = requests.get(self.url, params=params)
             if r.status_code == requests.codes.ok:
                 jsonResult = r.json()
+            else:
+                # print the returned error message 
+                print "Http Status Code:%s\n%s" % (r.status_code, r.json()['Message'])
+
         except Exception,e:
             print r.content
             raise e
