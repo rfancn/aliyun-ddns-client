@@ -50,7 +50,7 @@ if __name__ == "__main__":
         # if current public ip is not the same as the one in server
         if currentPublicIP != localRecord.value:
             if config.debug:
-                DDNSUtils.info("current public ip is:{0}, server ip is:%s".format(currentPublicIP, localRecord.value))
+                DDNSUtils.info("current public ip is:{0}, server ip is:{1}".format(currentPublicIP, localRecord.value))
 
             result = helper.sync(localRecord, currentPublicIP)
             if result is False:
