@@ -55,6 +55,6 @@ type=
 4. Make sure /etc/ddns.conf can be readable and writable for the user who setup cron job
 
 ### WORK FLOW
-1. When Aliyun ddns client rums first time, it will fetch subdomain record's id and save to local /etc/ddns.conf
+1. When Aliyun ddns client runs first time, it will fetch subdomain record's id and save to local /etc/ddns.conf
 2. Then it will compare current public ip with local value in /etc/ddns.conf, if it doesn't match, it will sync the current public ip to net.cn server 
 3. If sync operation done successfully, the new updated value(IP) in server side will be saved in local /etc/ddns.conf too
