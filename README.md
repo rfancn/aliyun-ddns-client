@@ -2,6 +2,16 @@
 
 Python DDNS client for Aliyun(http://www.guanxigo.com/netcn-ddns-client/)
 
+### PREREQUISITE
+Some 3rd party python libraries are required for aliyun-ddns-client as below, you can install it via pip or easy_install:
+
+- requests
+
+For example:
+```
+# pip install requests
+```
+
 ### INSTALLATION 
 1. copy all files to somewhere, e,g: /opt/aliyun-ddns-client
 2. copy ddns.conf.example to /etc/ddns.conf
