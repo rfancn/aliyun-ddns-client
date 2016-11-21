@@ -113,6 +113,7 @@ class DDNSHelper(object):
             return False
 
         # save domain record id for future reference
+        localRecord.id = remoteRecordId
         if not self.config.save(localRecord.alias, "id", remoteRecordId):
             DDNSUtils.err("Failed to save domain record id to config file")
             return False
