@@ -157,11 +157,15 @@ class YunResolver(object):
             if r.status_code == requests.codes.ok:
                 jsonResult = r.json()
         except Exception,e:
-            print r.content
+            if self.debug:
+                print "Exception in describeDomainRecords(), params: %s, http response: %s" % (params, r.content)
             raise e
 
         if not jsonResult:
             print "Failed to get valid Domain Records Info"
+            if self.debug:
+                print "In describeDomainRecords(), params: %s, http response: %s" % (params, r.content)
+            
             return []
 
         domainRecordList = []
@@ -218,7 +222,9 @@ class YunResolver(object):
                 print "Http Status Code:%s\n%s" % (r.status_code, r.content)
                 return False
         except Exception,e:
-            print r.content
+            if self.debug:
+                print "Exception in updateDomainRecord(), params: %s, http response: %s" % (params, r.content)
+            
             raise e
 
         return True
@@ -242,7 +248,9 @@ class YunResolver(object):
 
             jsonResult = r.json()
         except Exception,e:
-            print r.content
+            if self.debug:
+                print "Exception in describeDomainRecordInfo(), params: %s, http response: %s" % (params, r.content)
+            
             raise e
 
         return jsonResult
