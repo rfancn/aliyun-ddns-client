@@ -66,5 +66,8 @@ type=
 
 ### WORK FLOW
 1. When Aliyun ddns client rums first time, it will fetch subdomain record's id and save to local /etc/ddns.conf
-2. Then it will compare current public ip with local value in /etc/ddns.conf, if it doesn't match, it will sync the current public ip to net.cn server 
+2. Then it will compare current public ip with local value in /etc/ddns.conf, if it doesn't match, it will sync the current public ip to Aliyun server 
 3. If sync operation done successfully, the new updated value(IP) in server side will be saved in local /etc/ddns.conf too
+
+### NOTICE
+If you delete domain record and add a new one with same sub_domain and domain, though the full domain name seems the same, but the remote domain record id in Aliyun server is changed, for performance consideration, normal syncing will not touch the old record id saved in /etc/ddns.conf, you need clear 'id' or 'value' value in /etc/ddns.conf to trigger a forcefully resyncing process.
