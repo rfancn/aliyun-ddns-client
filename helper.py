@@ -51,6 +51,10 @@ class DDNSHelper(object):
         remoteRecordList = self.resolver.describeDomainRecords(domain, rrKeyword=subDomain, typeKeyword=type)
         if not remoteRecordList:
             return None
+         
+        if len(remoteRecordList) > 1:
+            DDNSUtils.err("Duplicate domain records set in Aliyun: (sub_domain: %s, domain: %s)" % (subDomain, domain))
+            return None
 
         return remoteRecordList[0]
 
