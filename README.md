@@ -71,3 +71,17 @@ type=
 
 ### NOTICE
 If you delete domain record and add a new one with same sub_domain and domain, the full domain name seems the same, but the remote domain record id in Aliyun server is changed, for performance consideration, normal syncing will not touch the old record id saved in /etc/ddns.conf, you need clear 'id' or 'value' value in /etc/ddns.conf to trigger a forcefully resyncing process.
+
+### FAQ
+
+* Q: Why it failed with error message "The input parameter \"Timestamp\" that is mandatory for processing this request is not supplied." in describeDomainRecords()?
+
+  A: Please check what's the value in params 'TimeStamp'. If the value has big difference with the correct time, you need use ntpdate to sync system time to the correct one.
+
+* Q: Why it failed with error message "Failed to save the config value"?
+
+  A: You need make sure current cronjob user has permission to write file /etc/ddns.conf.
+
+* Q: How to trigger a forcefully syncing?
+
+  A: Just clear 'id' or 'value' value in /etc/ddns.conf for specific domain record.
