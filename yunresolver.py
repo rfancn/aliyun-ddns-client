@@ -17,250 +17,220 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 """
-import requests
-import string
 import urllib
 import hashlib
 import hmac
 import uuid
 from datetime import datetime
 
-class DomainRecord(object):
-    def __init__(self, domainRecord):
-        self.domainname = None
-        self.recordid = None
-        self.rr = None
-        self.type = None
-        self.value = None
-        self.ttl = None
-        self.priority = None
-        self.line = None
-        self.status = None
-        self.locked = False
-
-        # convert json record key name to lowercased one
-        convertedDomainRecord = dict(zip(map(string.lower,domainRecord.keys()),domainRecord.values()))
-        try:
-            for k in convertedDomainRecord.keys():
-                self.__dict__[k] = convertedDomainRecord[k]
-        except Exception,e:
-            print "Failed to initiate DomainRecord object, no %s definition in DomainRecord" % k
-            raise e
+import requests
 
 class YunResolver(object):
-    def __init__(self, accessId, accessKey, debug):
+    """
+    Implementation of Aliyun Resolver API
+    """
+    def __init__(self, access_id, access_key, debug):
         self.url = "http://dns.aliyuncs.com/"
-        self.accessKeyId = accessId
-        self.hashKey = accessKey + '&'
+        self.access_id = access_id
+        self.hash_key = access_key + '&'
         self.debug = debug
 
-    def getTimeStamp(self):
+    def get_common_params(self):
         """
-        ISO8601 standard: YYYY-MM-DDThh:mm:ssZ, e,g:2015-0109T12:00:00Z (UTC Timezone)
-        @return string
-        """
-        return  datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
+        Build common params which need invoke Aliyun API
 
-    def getSignatureNonce(self):
+        :return: dict of all nessary params
         """
-        Unique random value
-        """
-        return uuid.uuid4()
+        # ISO8601 standard: YYYY-MM-DDThh:mm:ssZ, e,g:2015-0109T12:00:00Z (UTC Timezone)
+        current_timestamp = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
+        signature_nonce = uuid.uuid4()
 
-    def getCommonParams(self):
-        commonParams = {
+        common_params = {
             'Format': 'json',
             'Version': '2015-01-09',
-            'AccessKeyId': self.accessKeyId,
-            'TimeStamp': self.getTimeStamp(),
+            'AccessKeyId': self.access_id,
+            'TimeStamp': current_timestamp,
             'SignatureMethod': 'HMAC-SHA1',
-            'SignatureNonce': self.getSignatureNonce(),
+            'SignatureNonce': signature_nonce,
             'SignatureVersion': "1.0",
         }
 
-        return commonParams
+        return common_params
 
-    def getSignatureFollowRule(self, httpMethod, params):
-        """
-        Exactly follow the specification to generate the signature
-        """
-        def percentEncode(str):
-            str = str.encode("utf8")
-            return urllib.quote_plus(str).replace("+", "%20").replace("*", "%2A").replace("%7E", "~")
-
-        params.update(self.getCommonParams())
-        sortedParams = sorted(params.items())
-
-        # get Canonicalized Query String
-        canonString = ""
-        for k,v in sortedParams:
-            canonString += "&" + percentEncode(k) + "=" + percentEncode(v)
-
-        # format string for sign
-        signString = httpMethod + "&" + percentEncode("/") + "&" + percentEncode(canonString[1:])
-
-
-    def getSignature(self, httpMethod, params):
+    def get_signature(self, http_method, params):
         """
         1. params = combine specific params and common params
-        2. sortedParams = sort params by key
-        3. queryString = urlencode sortedParams
-        4. signString = HTTPMethod + "&" + urlencode "/" + quote_plus queryString
-        5. hashValue = sha1 with hashKey against signString
-        6. base64HashValue = base64 encoding hashValue
+        2. sorted_params = sort params by key
+        3. query_string = urlencode sorted_params
+        4. sign_str = HTTPMethod + "&" + urlencode "/" + quote_plus queryString
+        5. hash_value = sha1 with hash_key against sign_str
+        6. base64_hash_value = base64 encoding hash_value
         7. signature = urlencode base64HashValue
+
         @return string
         """
-        params.update(self.getCommonParams())
-        sortedParams = sorted(params.items())
-        canonString = urllib.urlencode(sortedParams)
-        signString = httpMethod + "&" + urllib.quote_plus("/") + "&" + urllib.quote_plus(canonString)
+        params.update(self.get_common_params())
+        sorted_params = sorted(params.items())
+        canon_str = urllib.urlencode(sorted_params)
+        sign_str = http_method + "&" + urllib.quote_plus("/") + "&" + urllib.quote_plus(canon_str)
 
         # hmac sha1 algrithm
-        hashValue = hmac.new(self.hashKey, signString, hashlib.sha1).digest()
-        signature=hashValue.encode("base64").rstrip('\n')
+        hash_value = hmac.new(self.hash_key, sign_str, hashlib.sha1).digest()
+        signature = hash_value.encode("base64").rstrip('\n')
 
         return signature
 
-    def describeDomainRecords(self, domainName, pageNumber=None, pageSize=None,
-                              rrKeyword="", typeKeyword="", valueKeyword=""):
+    def describe_domain_records(self, domain_name, page_number=None, page_size=None,
+                                rr_keyword="", type_keyword="", value_keyword=""):
         """
         query:  DomainName(*), PageNumber, PageSize, RRKeyWord, TypeKeyWord, ValueKeyWord
         return: TotalCount, PageNumber, PageSize, DomainRecords
         """
-        httpMethod = "GET"
+        http_method = "GET"
         params = {
             'Action': "DescribeDomainRecords",
-            'DomainName': domainName
+            'DomainName': domain_name
         }
 
-        optionalParams = {}
-        if pageNumber:
-            optionalParams['PageNumber'] = pageNumber
-        if pageSize:
-            optionalParams['PageSize'] = pageSize
-        if rrKeyword:
-            optionalParams['RRKeyWord']= rrKeyword
-        if typeKeyword:
-            optionalParams['TypeKeyWord']= typeKeyword
-        if valueKeyword:
-            optionalParams['ValueKeyWord'] = valueKeyword
+        optional_params = {}
+        if page_number:
+            optional_params['PageNumber'] = page_number
+        if page_size:
+            optional_params['PageSize'] = page_size
+        if rr_keyword:
+            optional_params['RRKeyWord'] = rr_keyword
+        if type_keyword:
+            optional_params['TypeKeyWord'] = type_keyword
+        if value_keyword:
+            optional_params['ValueKeyWord'] = value_keyword
 
-        params.update(optionalParams)
+        params.update(optional_params)
         # add signature
-        params.update({"Signature": self.getSignature(httpMethod, params)})
+        params.update({"Signature": self.get_signature(http_method, params)})
 
         # do real http action
-        jsonResult = None
         try:
-            r = requests.get(self.url, params=params)
-            if r.status_code == requests.codes.ok:
-                jsonResult = r.json()
-        except Exception,e:
-            if self.debug:
-                print "Exception in describeDomainRecords(), params: %s, http response: %s" % (params, r.content)
-            raise e
+            ret = requests.get(self.url, params=params)
+        except requests.RequestException as ex:
+            raise ex
 
-        if not jsonResult:
-            print "Failed to get valid Domain Records Info"
+        if ret.status_code != requests.codes.ok:
+            print "Server side problem: {0}".format(ret.status_code)
             if self.debug:
-                print "In describeDomainRecords(), params: %s, http response: %s" % (params, r.content)
-            
-            return []
+                print "Error in describeDomainRecords(), " \
+                       "params: {0},\nhttp response: {1}" \
+                       .format(params, ret.content)
+            return None
 
-        domainRecordList = []
+        domain_record_list = []
         try:
-            records = jsonResult['DomainRecords']['Record']
+            json_result = ret.json()
+            total_records = json_result.get('TotalCount', 0)
+            if total_records == 0:
+                return None
+
+            records = json_result['DomainRecords']['Record']
             for rec in records:
-                #dr = DomainRecord(rec)
-                domainRecordList.append(rec)
-        except Exception,e:
-            raise e
+                domain_record_list.append(rec)
+        except requests.RequestException as ex:
+            raise ex
 
-        return domainRecordList
+        return domain_record_list
 
-    def updateDomainRecord(self, recordId, rr="www", type="A", value="192.168.0.1",
-                           ttl=None, priority=None, line=None):
-        httpMethod = "GET"
+    def update_domain_record(self, record_id, rr="www", record_type="A", record_value="192.168.0.1",
+                             ttl=None, priority=None, line=None):
+        """
+        Update remote domain record on Aliyun server
+
+        :param record_id:     record id
+        :param rr:            sub domain
+        :param record_type:   record type
+        :param record_value:  record value
+        :param ttl:           TTL
+        :param priority:      priority
+        :param line:          resolve line
+
+        :return: True if succeed, of False if failed
+        """
+        http_method = "GET"
         params = {
             'Action': "UpdateDomainRecord",
-            'RecordId': recordId,
+            'RecordId': record_id,
             'RR': rr,
-            'Type': type,
-            'Value': value,
+            'Type': record_type,
+            'Value': record_value,
         }
 
-        optionalParams = {}
+        optional_params = {}
         if ttl:
-            validTTLs = [600, 1800, 3600, 43200, 86400]
-            if ttl not in validTTLs:
-                print "TTL is not a valid value, it need to be one of them: %s" % validTTLs
+            valid_ttl_list = [600, 1800, 3600, 43200, 86400]
+            if ttl not in valid_ttl_list:
+                print "Invalid TTL, it need to be one of them: %s" % valid_ttl_list
                 return False
-            optionalParams['TTL'] = ttl
+            optional_params['TTL'] = ttl
 
         if priority:
-            validPriorities = range(1,11)
-            if priority not in validPriorities:
-                print "Priority is not a valid value, it need to be one of them: %s" % validPriorities
-            optionalParams['Priority'] = priority
+            valid_priorities = range(1, 11)
+            if priority not in valid_priorities:
+                print "Invalid priority, it need to be one of them: %s" % valid_priorities
+            optional_params['Priority'] = priority
 
         if line:
-            validLines = ['default', 'telecom', 'unicom', 'mobile', 'oversea', 'edu', 'google', 'baidu', 'biying']
-            if line not in validLines:
-                print "Line is not a valid value, it need to be one of them: %s" % validLines
+            valid_lines = ['default', 'telecom', 'unicom',
+                           'mobile', 'oversea', 'edu',
+                           'google', 'baidu', 'biying']
+            if line not in valid_lines:
+                print "Invalid line, it need to be one of them: %s" % valid_lines
                 return False
-            optionalParams['Line']= line
+            optional_params['Line'] = line
 
-        params.update(optionalParams)
+        params.update(optional_params)
         # add signature
-        params.update({"Signature": self.getSignature(httpMethod, params)})
+        params.update({"Signature": self.get_signature(http_method, params)})
 
         # do real http action
         try:
-            r = requests.get(self.url, params=params)
-            if r.status_code != requests.codes.ok:
-                print "Http Status Code:%s\n%s" % (r.status_code, r.content)
-                return False
-        except Exception,e:
+            ret = requests.get(self.url, params=params)
+        except requests.RequestException as ex:
+            raise ex
+
+        if ret.status_code != requests.codes.ok:
+            print "Server side problem: {0}".format(ret.status_code)
             if self.debug:
-                print "Exception in updateDomainRecord(), params: %s, http response: %s" % (params, r.content)
-            
-            raise e
+                print "Error in updateDomainRecord(), " \
+                       "params: {0},\nhttp response: {1}" \
+                       .format(params, ret.content)
+            return False
 
         return True
 
-    def describeDomainRecordInfo(self, recordId):
-        httpMethod = "GET"
+    def describe_domain_record_info(self, record_id):
+        """
+        Fetch remote domain record info by record id
+
+        :param record_id:  domain record id
+        :return:  dict
+        """
+        http_method = "GET"
         params = {
             'Action': "DescribeDomainRecordInfo",
-            'RecordId': recordId,
+            'RecordId': record_id,
         }
         # add signature
-        params.update({"Signature": self.getSignature(httpMethod, params)})
+        params.update({"Signature": self.get_signature(http_method, params)})
 
         # do real http action
-        jsonResult = None
         try:
-            r = requests.get(self.url, params=params)
-            if r.status_code != requests.codes.ok:
-                print "Http Status Code:%s\n%s" % (r.status_code, r.content)
-                return False
+            ret = requests.get(self.url, params=params)
+        except requests.RequestException as ex:
+            raise ex
 
-            jsonResult = r.json()
-        except Exception,e:
+        if ret.status_code != requests.codes.ok:
+            print "Server side problem: {0}".format(ret.status_code)
             if self.debug:
-                print "Exception in describeDomainRecordInfo(), params: %s, http response: %s" % (params, r.content)
-            
-            raise e
+                print "Error in describeDomainRecordInfo(), " \
+                       "params: {0},\nhttp response: {1}" \
+                       .format(params, ret.content)
+            return False
 
-        return jsonResult
-
-
-
-
-
-
-
-
-
-
+        return ret.json()

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 """
- Copyright (C) 2010-2013, Ryan Fan <reg_info@126.com>
+ Copyright (C) 2010-2013, Ryan Fan
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -17,56 +17,54 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 """
-import sys
-from helper import DDNSHelper
 from utils import DDNSUtils
 from config import DDNSConfig
+from record import DDNSDomainRecordManager
 
-CONF_FILE = "/etc/ddns.conf"
+def main():
+    """
+    Main routine
+    """
+    config = DDNSConfig()
+    record_manager = DDNSDomainRecordManager(config)
+
+    # get current public ip for this server
+    current_public_ip = DDNSUtils.get_current_public_ip()
+    if not current_public_ip:
+        DDNSUtils.err_and_exit("Failed to get current public IP")
+
+    for local_record in record_manager.local_record_list:
+        dns_resolved_ip = DDNSUtils.get_dns_resolved_ip(local_record.subdomain,
+                                                        local_record.domainname)
+
+        if current_public_ip == dns_resolved_ip:
+            DDNSUtils.info("Skipped as no changes for DomainRecord" \
+                           "[{rec.subdomain}.{rec.domainname}]".format(rec=local_record))
+            continue
+
+        # If current public IP doesn't equal to current DNS resolved ip, only in three cases:
+        # 1. The new synced IP for remote record in Aliyun doesn't take effect yet
+        # 2. remote record's IP in Aliyun server has changed
+        # 3. current public IP is changed
+        remote_record = record_manager.fetch_remote_record(local_record)
+        if not remote_record:
+            DDNSUtils.err("Failed finding remote DomainRecord" \
+                          "[{rec.subdomain}.{rec.domainname}]".format(rec=local_record))
+            continue
+
+        if current_public_ip == remote_record.value:
+            DDNSUtils.info("Skipped as we already updated DomainRecord" \
+                           "[{rec.subdomain}.{rec.domainname}]".format(rec=local_record))
+            continue
+
+        # if we can fetch remote record and record's value doesn't equal to public IP
+        sync_result = record_manager.update(remote_record, current_public_ip)
+        if not sync_result:
+            DDNSUtils.err("Failed updating DomainRecord" \
+                          "[{rec.subdomain}.{rec.domainname}]".format(rec=local_record))
+        else:
+            DDNSUtils.info("Successfully updated DomainRecord" \
+                           "[{rec.subdomain}.{rec.domainname}]".format(rec=local_record))
 
 if __name__ == "__main__":
-    config = DDNSConfig(CONF_FILE)
-    config.validate()
-
-    utils = DDNSUtils(config.debug)
-    helper = DDNSHelper(config)
-
-    # get current public ip
-    currentPublicIP = utils.getCurrentPublicIP()
-    if not currentPublicIP:
-        DDNSUtils.err_and_exit("Failed to get current public ip")
-
-    for localRecord in config.localDomainRecordList:
-        # if we don't have domain record's id in config file, then we never sync to server before
-        if not localRecord.id or not localRecord.value:
-            result = helper.syncFirstTime(localRecord,currentPublicIP)
-            if result is False:
-                DDNSUtils.err_and_exit("Failed doing the first time sync for record:{0}".format(localRecord.alias))
-                continue
-
-            DDNSUtils.info("Successfully sync done for record:{0}".format(localRecord.alias))
-            continue
-
-        # if current public ip is not the same as the one in server
-        if currentPublicIP != localRecord.value:
-            if config.debug:
-                DDNSUtils.info("current public ip is:{0}, server ip is:{1}".format(currentPublicIP, localRecord.value))
-
-            result = helper.sync(localRecord, currentPublicIP)
-            if result is False:
-                DDNSUtils.err_and_exit("Failed to sync the current public IP for record:{0}".format(localRecord.alias))
-
-            DDNSUtils.info("Successfully sync done on:{0}".format(utils.getCurrentTime()))
-            sys.exit(0)
-
-        # all done for one record
-        if config.debug:
-            DDNSUtils.info("No changes,skipped...")
-            continue
-
-
-
-
-
-
-
+    main()

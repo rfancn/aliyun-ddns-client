@@ -17,68 +17,89 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 """
-import requests
 import socket
+from socket import error as socket_error
 import sys
 from datetime import datetime
 
-class DDNSUtils:
-    def __init__(self, debug):
-        self.debug = debug
+import requests
+
+class DDNSUtils(object):
+    """
+    Utils class wrapper
+    """
+    @staticmethod
+    def err(msg):
+        """
+        Output error message
+        :param msg: Message to be displayed
+        """
+        sys.stderr.write("{0}\t[ERROR]\t{1}\n".format(DDNSUtils.get_current_time(), msg))
 
     @staticmethod
-    def err(str):
-        sys.stderr.write("{0}\t[ERROR]\t{1}\n".format(DDNSUtils.getCurrentTime(), str))
+    def info(msg):
+        """
+        Output informative message
+        :param msg: Message to be displayed
+        """
+        sys.stdout.write("{0}\t[INFO]\t{1}\n".format(DDNSUtils.get_current_time(), msg))
 
     @staticmethod
-    def info(str):
-        sys.stdout.write("{0}\t[INFO]\t{1}\n".format(DDNSUtils.getCurrentTime(), str))
-
-    @staticmethod
-    def err_and_exit(str):
-        sys.stderr.write("{0}\t[ERROR]\t{1}\n".format(DDNSUtils.getCurrentTime(), str))
+    def err_and_exit(msg):
+        """
+        Output error message and exit
+        :param msg: Message to be displayed
+        """
+        sys.stderr.write("{0}\t[ERROR]\t{1}\n".format(DDNSUtils.get_current_time(), msg))
         sys.exit(1)
 
-    def getCurrentPublicIP(self):
+    @classmethod
+    def get_current_public_ip(cls):
         """
         Get current public IP
 
-        @return None or ip string
+        @return  IP address or None
         """
-        ip = None
         try:
-            r = requests.get("http://members.3322.org/dyndns/getip")
-            if r.status_code == requests.codes.ok:
-                ip = r.content.rstrip("\n")
-            else:
-                if self.debug:
-                    self.info("Http Status Code:{0}\n{1}".format(r.status_code, r.content))
-                else:
-                    self.err("Failed to get current public IP, pls check network settings")
-        except Exception,e:
-            self.err("network problem:{0}".format(e))
+            ret = requests.get("http://members.3322.org/dyndns/getip")
+        except requests.RequestException as ex:
+            cls.err("network problem:{0}".format(ex))
+            return None
 
-        return ip
+        if ret.status_code != requests.codes.ok:
+            cls.err("Failed to get current public IP: {0}\n{1}" \
+                    .format(ret.status_code, ret.content))
+            return None
 
-    def getCurrenDNSResolvedIP(self, domainName, subDomainName):
+        return ret.content.rstrip("\n")
+
+    @classmethod
+    def get_dns_resolved_ip(cls, subdomain, domainname):
         """
-        Get current ip resolved by DNS server,
-        Due for local DNS cache, it may be not synced to the one recorded in DNS service provider
+        Get current IP address resolved by DNS server
+
+        :param subdomain:  sub domain
+        :param domainname:     domain name
+        :return:  IP address or None
         """
-        ip = None
+        ip_addr = None
         try:
-            ip = socket.gethostbyname("{0}.{1}".format(subDomainName,domainName))
-        except Exception,e:
-            self.err("network problem:{0}".format(e))
+            hostname = "{0}.{1}".format(subdomain, domainname)
+            if subdomain == '@':
+                hostname = domainname
 
-        return ip
+            ip_addr = socket.gethostbyname(hostname)
+        except socket_error as ex:
+            cls.err("DomainRecord[{0}] cannot be resolved because of:{1}" \
+                     .format(hostname, ex))
+
+        return ip_addr
 
     @staticmethod
-    def getCurrentTime():
+    def get_current_time():
+        """
+        Get human readable standard timestamp
+
+        :return: timestamp string
+        """
         return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-
-
-
-
-
