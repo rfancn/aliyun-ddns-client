@@ -1,6 +1,6 @@
-## aliyun-ddns-client
+## aliyun-ddns-client(v0.2)
 
-Python DDNS client for Aliyun(http://www.guanxigo.com/netcn-ddns-client/)
+Python DDNS client for Aliyun(http://www.guanxigo.com/aliyun-ddns-client/)
 
 ### LIMITATION
 This version of DDNS client only supports auto updating 'A' type DomainRecord with IPV4 address.
