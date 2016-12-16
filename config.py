@@ -21,6 +21,8 @@ import ConfigParser
 from utils import DDNSUtils
 
 CONF_FILE = "ddns.conf"
+# Compaitible consideration for v0.1
+SYS_CONF_FILE = "/etc/ddns.conf"
 
 class DDNSConfig(object):
     """
@@ -35,7 +37,9 @@ class DDNSConfig(object):
 
         self.parser = ConfigParser.ConfigParser()
         if not self.parser.read(CONF_FILE):
-            DDNSUtils.err_and_exit("Failed to read config file.")
+            # Compaitible consideration for v0.1
+            if not self.parser.read(SYS_CONF_FILE):
+                DDNSUtils.err_and_exit("Failed to read config file.")
 
         try:
             self.debug = self.parser.getboolean("DEFAULT", "debug")
