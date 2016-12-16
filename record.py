@@ -121,23 +121,33 @@ class DDNSDomainRecordManager(object):
         :return:  RemoteDomainRecord or None
         """
         try:
-            remote_record_list = self.resolver.describe_domain_records(local_record.domainname,
+            # Aliyun use fuzzy matching pattern for RR and type keyword
+            fuzzy_matched_list = self.resolver.describe_domain_records(local_record.domainname,
                                                                        rr_keyword=local_record.rr,
                                                                        type_keyword=local_record.type)
         except:
             DDNSUtils.err("Failed to fetch remote DomainRecords.")
             return None
 
-        if not remote_record_list:
+        if not fuzzy_matched_list:
             return None
 
-        if len(remote_record_list) > 1:
+        exact_matched_list = []
+        check_keys = ('DomainName', 'RR', 'Type')
+        for rec in fuzzy_matched_list:
+            if all(rec.get(key, None) == getattr(local_record, key.lower()) for key in check_keys):
+                exact_matched_list.append(rec)
+
+        if not exact_matched_list:
+            return None
+
+        if len(exact_matched_list) > 1:
             DDNSUtils.err("Duplicate DomainRecord in Aliyun: {rec.subdomain}.{rec.domainname}"
                           .format(rec=local_record))
             return None
 
         try:
-            remote_record = RemoteDomainRecord(remote_record_list[0])
+            remote_record = RemoteDomainRecord(exact_matched_list[0])
         except:
             return None
 
@@ -152,5 +162,5 @@ class DDNSDomainRecordManager(object):
         :return: True or False
         """
         return self.resolver.update_domain_record(remote_record.recordid,
-                                                   rr=remote_record.rr,
-                                                   record_value=current_public_ip)
+                                                  rr=remote_record.rr,
+                                                  record_value=current_public_ip)
