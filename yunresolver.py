@@ -30,7 +30,7 @@ class YunResolver(object):
     Implementation of Aliyun Resolver API
     """
     def __init__(self, access_id, access_key, debug):
-        self.url = "http://dns.aliyuncs.com/"
+        self.url = "https://dns.aliyuncs.com/"
         self.access_id = access_id
         self.hash_key = access_key + '&'
         self.debug = debug
