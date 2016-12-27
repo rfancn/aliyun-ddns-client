@@ -120,16 +120,12 @@ class DDNSDomainRecordManager(object):
         :param    LocalDomainRecord
         :return:  RemoteDomainRecord or None
         """
-        try:
-            # Aliyun use fuzzy matching pattern for RR and type keyword
-            fuzzy_matched_list = self.resolver.describe_domain_records(local_record.domainname,
-                                                                       rr_keyword=local_record.rr,
-                                                                       type_keyword=local_record.type)
-        except:
-            DDNSUtils.err("Failed to fetch remote DomainRecords.")
-            return None
-
+        # Aliyun use fuzzy matching pattern for RR and type keyword
+        fuzzy_matched_list = self.resolver.describe_domain_records(local_record.domainname,
+                                                                   rr_keyword=local_record.rr,
+                                                                   type_keyword=local_record.type)
         if not fuzzy_matched_list:
+            DDNSUtils.err("Failed to fetch remote DomainRecords.")
             return None
 
         exact_matched_list = []
