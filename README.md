@@ -80,3 +80,12 @@ Only domain records both defined in local config file and Aliyun server will be 
 * Q: Why it failed with error message "Failed to save the config value"?
 
   A: You need make sure current cronjob user has permission to write file /etc/ddns.conf.
+  
+* Q: Why it raise exception "AttributeError: 'X509' object has no attribute '_x509'"?
+  
+  A: PyOpenSSL version need >= 0.14, and you may try to fix this problem by do following:
+  ```
+  sudo yum uninstall python-requests
+  sudo pip uninstall pyopenssl cryptography requests
+  sudo pip install requests
+  ```
