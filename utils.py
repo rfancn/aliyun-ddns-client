@@ -71,7 +71,7 @@ class DDNSUtils(object):
                     .format(ret.status_code, ret.content))
             return None
 
-        return ret.content.rstrip("\n")
+        return ret.content.decode('utf-8').rstrip("\n")
 
     @classmethod
     def get_dns_resolved_ip(cls, subdomain, domainname):

@@ -17,7 +17,13 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 """
-import ConfigParser
+from __future__ import print_function
+import sys
+if sys.version_info < (3,):
+    import ConfigParser
+else:
+    import configparser as ConfigParser
+
 from utils import DDNSUtils
 
 CONF_FILE = "ddns.conf"
@@ -76,8 +82,8 @@ class DDNSConfig(object):
         try:
             value = self.parser.get(section, option)
         except ConfigParser.NoSectionError:
-            print "No section: {0}".format(section)
+            print("No section: {0}".format(section))
         except ConfigParser.NoOptionError:
-            print "No option {0} in section: {1}".format(option, section)
+            print("No option {0} in section: {1}".format(option, section))
 
         return value

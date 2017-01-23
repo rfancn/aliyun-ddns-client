@@ -17,7 +17,14 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 """
-import string
+import sys
+if sys.version_info < (3,):
+    import string
+    def lower_func(s):
+        return string.lower(s)
+else:
+    def lower_func(s):
+        return str.lower(s)
 
 from utils import DDNSUtils
 from yunresolver import YunResolver
@@ -64,7 +71,7 @@ class RemoteDomainRecord(object):# pylint: disable=too-many-instance-attributes,
         self.locked = False
 
         # convert json record key name to lowercased one
-        converted_domain_record_info = dict(zip(map(string.lower, domain_record_info.keys()),
+        converted_domain_record_info = dict(zip(map(lower_func, domain_record_info.keys()),
                                                 domain_record_info.values()))
 
         for k in converted_domain_record_info.keys():
@@ -144,8 +151,8 @@ class DDNSDomainRecordManager(object):
 
         try:
             remote_record = RemoteDomainRecord(exact_matched_list[0])
-        except:
-            return None
+        except Exception as ex:
+            raise ex
 
         return remote_record
 

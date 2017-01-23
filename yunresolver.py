@@ -17,9 +17,15 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 """
-import urllib
-import hashlib
+from __future__ import print_function
+import sys
+if sys.version_info < (3,):
+    from urllib import urlencode, quote_plus 
+else:
+    from urllib.parse import urlencode, quote_plus
+
 import hmac
+import hashlib
 import uuid
 from datetime import datetime
 
@@ -69,14 +75,24 @@ class YunResolver(object):
 
         @return string
         """
+        def sha1_hmac(key, str_to_sign):
+            if sys.version_info < (3,):
+                hash_value = hmac.new(self.hash_key, sign_str, hashlib.sha1).digest()
+                return hash_value.encode('base64').strip('\n')
+            else:
+                from base64 import b64encode
+                key = bytes(key, 'utf-8') 
+                str_to_sign = bytes(str_to_sign, 'utf-8')
+                byte_hash_value = hmac.new(key, str_to_sign, hashlib.sha1).digest()
+                return str(b64encode(byte_hash_value), 'utf8').strip('\n')
+
         params.update(self.get_common_params())
         sorted_params = sorted(params.items())
-        canon_str = urllib.urlencode(sorted_params)
-        sign_str = http_method + "&" + urllib.quote_plus("/") + "&" + urllib.quote_plus(canon_str)
+        canon_str = urlencode(sorted_params)
+        sign_str = http_method + "&" + quote_plus("/") + "&" + quote_plus(canon_str)
 
         # hmac sha1 algrithm
-        hash_value = hmac.new(self.hash_key, sign_str, hashlib.sha1).digest()
-        signature = hash_value.encode("base64").rstrip('\n')
+        signature = sha1_hmac(self.hash_key, sign_str) 
 
         return signature
 
@@ -115,11 +131,11 @@ class YunResolver(object):
             raise ex
 
         if ret.status_code != requests.codes.ok:
-            print "Server side problem: {0}".format(ret.status_code)
+            print("Server side problem: {0}".format(ret.status_code))
             if self.debug:
-                print "Error in describeDomainRecords(), " \
+                print("Error in describeDomainRecords(), " \
                        "params: {0},\nhttp response: {1}" \
-                       .format(params, ret.content)
+                       .format(params, ret.content))
             return None
 
         domain_record_list = []
@@ -165,14 +181,14 @@ class YunResolver(object):
         if ttl:
             valid_ttl_list = [600, 1800, 3600, 43200, 86400]
             if ttl not in valid_ttl_list:
-                print "Invalid TTL, it need to be one of them: %s" % valid_ttl_list
+                print("Invalid TTL, it need to be one of them: %s" % valid_ttl_list)
                 return False
             optional_params['TTL'] = ttl
 
         if priority:
             valid_priorities = range(1, 11)
             if priority not in valid_priorities:
-                print "Invalid priority, it need to be one of them: %s" % valid_priorities
+                print("Invalid priority, it need to be one of them: %s" % valid_priorities)
             optional_params['Priority'] = priority
 
         if line:
@@ -180,7 +196,7 @@ class YunResolver(object):
                            'mobile', 'oversea', 'edu',
                            'google', 'baidu', 'biying']
             if line not in valid_lines:
-                print "Invalid line, it need to be one of them: %s" % valid_lines
+                print("Invalid line, it need to be one of them: %s" % valid_lines)
                 return False
             optional_params['Line'] = line
 
@@ -195,11 +211,11 @@ class YunResolver(object):
             raise ex
 
         if ret.status_code != requests.codes.ok:
-            print "Server side problem: {0}".format(ret.status_code)
+            print("Server side problem: {0}".format(ret.status_code))
             if self.debug:
-                print "Error in updateDomainRecord(), " \
+                print("Error in updateDomainRecord(), " \
                        "params: {0},\nhttp response: {1}" \
-                       .format(params, ret.content)
+                       .format(params, ret.content))
             return False
 
         return True
@@ -226,11 +242,11 @@ class YunResolver(object):
             raise ex
 
         if ret.status_code != requests.codes.ok:
-            print "Server side problem: {0}".format(ret.status_code)
+            print("Server side problem: {0}".format(ret.status_code))
             if self.debug:
-                print "Error in describeDomainRecordInfo(), " \
+                print("Error in describeDomainRecordInfo(), " \
                        "params: {0},\nhttp response: {1}" \
-                       .format(params, ret.content)
+                       .format(params, ret.content))
             return False
 
         return ret.json()
