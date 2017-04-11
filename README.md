@@ -6,7 +6,7 @@ If you feels it is helpful, pls support me by clicking AD in websiste [**guanxig
 
 ## aliyun-ddns-client(v0.2)
 
-Python DDNS client for Aliyun(http://www.guanxigo.com/aliyun-ddns-client/)
+Python DDNS client for Aliyun(http://www.guanxigo.com/blog/project/aliyun-ddns-client)
 
 ### LIMITATION
 This version of DDNS client only supports auto updating 'A' type DomainRecord with IPV4 address.
