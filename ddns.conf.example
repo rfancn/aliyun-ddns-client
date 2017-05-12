@@ -1,0 +1,17 @@
+[DEFAULT]
+# Required: access id obtains from aliyun
+access_id=
+# Required: access key obtains from aliyun
+access_key=
+# Optional: not used now
+interval=600
+# Optional: turn on debug mode or not
+debug=true
+
+[DomainRecord1]
+# Required: domain name, like google.com
+domain=
+# Required: subdomain name, like www, blog, bbs
+sub_domain=
+# Required: resolve type, now it only supports 'A'
+type=A
