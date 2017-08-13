@@ -20,7 +20,7 @@
 from __future__ import print_function
 import sys
 if sys.version_info < (3,):
-   from urllib import urlencode, quote_plus 
+    from urllib import urlencode, quote_plus 
 else:
     from urllib.parse import urlencode, quote_plus
 
@@ -47,7 +47,8 @@ class YunResolver(object):
 
         :return: dict of all nessary params
         """
-        # ISO8601 standard: YYYY-MM-DDThh:mm:ssZ, e,g:2015-0109T12:00:00Z (UTC Timezone)
+
+      # ISO8601 standard: YYYY-MM-DDThh:mm:ssZ, e,g:2015-0109T12:00:00Z (UTC Timezone)
         current_timestamp = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
         signature_nonce = uuid.uuid4()
 
@@ -95,6 +96,7 @@ class YunResolver(object):
         signature = sha1_hmac(self.hash_key, sign_str) 
 
         return signature
+
     def describe_domain_records(self, domain_name, page_number=None, page_size=None,
                                 rr_keyword="", type_keyword="", value_keyword=""):
         """
