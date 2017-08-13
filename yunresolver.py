@@ -20,7 +20,7 @@
 from __future__ import print_function
 import sys
 if sys.version_info < (3,):
-    from urllib import urlencode, quote_plus 
+   from urllib import urlencode, quote_plus 
 else:
     from urllib.parse import urlencode, quote_plus
 
@@ -43,7 +43,7 @@ class YunResolver(object):
 
     def get_common_params(self):
         """
-        Build common params which need invoke Aliyun API
+        Build common params need by Aliyun API
 
         :return: dict of all nessary params
         """
@@ -55,7 +55,7 @@ class YunResolver(object):
             'Format': 'json',
             'Version': '2015-01-09',
             'AccessKeyId': self.access_id,
-            'TimeStamp': current_timestamp,
+            'Timestamp': current_timestamp,
             'SignatureMethod': 'HMAC-SHA1',
             'SignatureNonce': signature_nonce,
             'SignatureVersion': "1.0",
@@ -95,7 +95,6 @@ class YunResolver(object):
         signature = sha1_hmac(self.hash_key, sign_str) 
 
         return signature
-
     def describe_domain_records(self, domain_name, page_number=None, page_size=None,
                                 rr_keyword="", type_keyword="", value_keyword=""):
         """
