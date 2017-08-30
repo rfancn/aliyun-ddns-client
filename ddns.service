@@ -1,12 +1,10 @@
 [Unit]
-Description=Aliyun DDNS Client
+Description=Aliyun DDNS Client.
 Wants=network-online.target
 After=network.target network-online.target
 
 [Service]
 Type=simple
-WorkingDirectory=/home/ryan/tools/aliyun-ddns-client
+WorkingDirectory=/root/tools/aliyun-ddns-client
 ExecStart=/usr/bin/python ddns.py
 
-[Install]
-WantedBy=multi-user.target
