@@ -43,14 +43,11 @@ For example:
 2. Rename "ddns.conf.example" to "ddns.conf" in the same dir
 3. Copy two files: "ddns.timer" and "ddns.service" to "/usr/lib/systemd/system"
 4. 
-`root@local# systemctl daemon-reload
-`
-`
+```
+ root@local# systemctl daemon-reload
  root@local# systemctl start ddns.timer
-`
-`
  root@local# systemctl status ddns.timer -l
-`
+```
 
 ### CONFIGURATION
 Required options need to be set in /etc/ddns.conf:
