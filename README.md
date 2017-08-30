@@ -29,7 +29,7 @@ For example:
 
 ### INSTALLATION 
 
-## 1. USE CRONJOB
+#### 1. USE CRONJOB
 1. Download all files to somewhere, e,g: /opt/aliyun-ddns-client
 2. Rename "ddns.conf.example" to "ddns.conf" in the same dir
 3. Create a cronjob which execute "python ddns.py" periodly, e,g:
@@ -38,7 +38,7 @@ For example:
 `
 4. Make sure ddns.conf can be accessed by cronjob user
 
-## 2. USE SYSTEMD
+#### 2. USE SYSTEMD
 1. Download all files to some where, e,g:/root/tools/aliyun-ddns-client
 2. Rename "ddns.conf.example" to "ddns.conf" in the same dir
 3. Copy two files: "ddns.timer" and "ddns.service" to "/usr/lib/systemd/system"
