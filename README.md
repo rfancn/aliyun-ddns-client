@@ -44,9 +44,11 @@ For example:
 3. Copy two files: "ddns.timer" and "ddns.service" to "/usr/lib/systemd/system"
 4. 
 `root@local# systemctl daemon-reload
-
+`
+`
  root@local# systemctl start ddns.timer
- 
+`
+`
  root@local# systemctl status ddns.timer -l
 `
 
