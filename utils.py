@@ -85,7 +85,8 @@ class DDNSUtils(object):
         ip_addr = None
         try:
             hostname = "{0}.{1}".format(subdomain, domainname)
-            if subdomain == '@':
+            # special handling logic to support "@" and "*" subdomain
+            if subdomain and subdomain.strip() in ("@", "*"):
                 hostname = domainname
 
             ip_addr = socket.gethostbyname(hostname)
