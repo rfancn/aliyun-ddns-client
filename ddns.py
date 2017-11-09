@@ -33,8 +33,22 @@ def main():
     if not current_public_ip:
         DDNSUtils.err_and_exit("Failed to get current public IP")
 
+    # find all normal local records 
+    normal_subdomains = [ r.subdomain for r in record_manager.local_record_list \
+                          if r.subdomain not in ("@", "*") ]
+
     for local_record in record_manager.local_record_list:
-        dns_resolved_ip = DDNSUtils.get_dns_resolved_ip(local_record.subdomain,
+        # To support "*" generic subdomain, 
+        # it will try to resolve the first local normal subdomain,
+        # or it will fall back to resolve the domain_name without subdomain prefix
+        if local_record.subdomain == "*":
+            generic_subdomain = "@"
+            if normal_subdomains:
+                generic_subdomain = normal_subdomains[0]
+            dns_resolved_ip = DDNSUtils.get_dns_resolved_ip(generic_subdomain,
+                                                           local_record.domainname)
+        else:
+            dns_resolved_ip = DDNSUtils.get_dns_resolved_ip(local_record.subdomain,
                                                         local_record.domainname)
 
         if current_public_ip == dns_resolved_ip:
