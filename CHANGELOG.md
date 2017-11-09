@@ -1,15 +1,15 @@
-## [v0.3] (2017-11-09)
+## [v0.3](#) (2017-11-09)
 
 ### Enhancement 
 
 - Add support for "*" subdomain 
 
-## [v0.2] (2017-08-30)
+## [v0.2](#) (2017-08-30)
 
-### Enhancement 
+### Added 
 
 - Add systemd service control file
 
-### Fixes 
+### Fixed 
 
 - Fixed the MissingTimestamp error caused by changes of Aliyun DDNS API 
