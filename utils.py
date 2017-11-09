@@ -21,6 +21,8 @@ import socket
 from socket import error as socket_error
 import sys
 from datetime import datetime
+import string
+import random
 
 import requests
 
@@ -84,9 +86,15 @@ class DDNSUtils(object):
         """
         ip_addr = None
         try:
-            hostname = "{0}.{1}".format(subdomain, domainname)
-            if subdomain == '@':
-                hostname = domainname
+            if subdomain == "@":
+                hostname = domainname 
+            elif subdomain == "*":
+                # To support "*" subdomain definition,
+                # We need generate a non-exist subdomain
+                fake_subdomain = ''.join([random.choice(string.lowercase) for i in xrange(12)])
+                hostname = "{0}.{1}".format(fake_subdomain, domainname)
+            else:
+                hostname = "{0}.{1}".format(subdomain, domainname)
 
             ip_addr = socket.gethostbyname(hostname)
         except socket_error as ex:
