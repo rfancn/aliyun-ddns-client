@@ -21,12 +21,17 @@ import socket
 from socket import error as socket_error
 import sys
 from datetime import datetime
-import string
-import random
+import uuid
 
 import requests
 
 class DDNSUtils(object):
+    # To support "*" subdomain definition,
+    # We need generate a non-exist subdomain name
+    # Here we generate a random UUID for that
+    #fake_subdomain = ''.join([random.choice(string.lowercase) for i in xrange(12)])
+    RANDOM_UUID = uuid.uuid4().hex 
+
     """
     Utils class wrapper
     """
@@ -89,10 +94,7 @@ class DDNSUtils(object):
             if subdomain == "@":
                 hostname = domainname 
             elif subdomain == "*":
-                # To support "*" subdomain definition,
-                # We need generate a non-exist subdomain
-                fake_subdomain = ''.join([random.choice(string.lowercase) for i in xrange(12)])
-                hostname = "{0}.{1}".format(fake_subdomain, domainname)
+                hostname = "{0}.{1}".format(cls.RANDOM_UUID, domainname)
             else:
                 hostname = "{0}.{1}".format(subdomain, domainname)
 

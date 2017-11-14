@@ -11,7 +11,7 @@ debug=true
 [DomainRecord1]
 # Required: domain name, like google.com
 domain=
-# Required: subdomain name, like www, blog, bbs
+# Required: subdomain name, like: *, www, blog, bbs
 sub_domain=
 # Required: resolve type, now it only supports 'A'
 type=A
