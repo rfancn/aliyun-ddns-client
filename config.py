@@ -40,6 +40,8 @@ class DDNSConfig(object):
         self.interval = 600
         self.access_id = None
         self.access_key = None
+        self.serverchan_sckey = None
+        self.open_serverchan = None
 
         self.parser = ConfigParser.ConfigParser()
         if not self.parser.read(CONF_FILE):
@@ -51,6 +53,8 @@ class DDNSConfig(object):
             self.debug = self.parser.getboolean("DEFAULT", "debug")
             self.access_id = self.parser.get("DEFAULT", "access_id")
             self.access_key = self.parser.get("DEFAULT", "access_key")
+            self.serverchan_sckey = self.parser.get("DEFAULT", "serverchan_sckey")
+            self.open_serverchan = self.parser.getboolean("DEFAULT", "open_serverchan")
         except ValueError as ex:
             DDNSUtils.err_and_exit("Invalid debug in config: {0}".format(ex))
         except ConfigParser.NoSectionError as ex:
