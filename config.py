@@ -62,9 +62,9 @@ class DDNSConfig(object):
             DDNSUtils.err_and_exit("Invalid access_id or access_key in config file.")
         
         if self.parser.has_section("feature_public_ip_from_nic"):
-            self.get_feature_public_ip_from_nic_option()
+            self.get_feature_public_ip_from_nic_options()
         else:
-            self.feature_public_ip_from_nic_enabled = False
+            self.pifn_enable = False
         
 
     def get_domain_record_sections(self):
@@ -96,7 +96,7 @@ class DDNSConfig(object):
 
         return value
 
-    def get_feature_public_ip_from_nic_option(self):
+    def get_feature_public_ip_from_nic_options(self):
         """
         Get options about the getting ip from nic.
         """
@@ -108,12 +108,12 @@ class DDNSConfig(object):
         except ConfigParser.NoOptionError as ex:
             enable = False
 
-        self.feature_public_ip_from_nic_enabled = enable
+        self.pifn_enable = enable
         if enable:
             try:
-                self.interface = self.parser.get(section_name, "interface")
+                self.pifn_interface = self.parser.get(section_name, "interface")
             except ConfigParser.NoOptionError as ex:
                 DDNSUtils.err_and_exit("No interface specified")
 
-            if self.interface == "":
+            if self.pifn_interface == "":
                 DDNSUtils.err_and_exit("Empty interface")

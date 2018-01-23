@@ -29,8 +29,8 @@ def main():
     record_manager = DDNSDomainRecordManager(config)
 
     # get current public ip for this server
-    if config.feature_public_ip_from_nic_enabled:
-        current_public_ip = DDNSUtils.get_interface_address(config.interface)
+    if config.pifn_enable:
+        current_public_ip = DDNSUtils.get_interface_address(config.pifn_interface)
     else:
         current_public_ip = DDNSUtils.get_current_public_ip()
     if not current_public_ip:
