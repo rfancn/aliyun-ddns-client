@@ -23,6 +23,8 @@ import sys
 from datetime import datetime
 import uuid
 
+import requests
+
 
 class DDNSUtils(object):
     # To support "*" subdomain definition,
@@ -60,28 +62,24 @@ class DDNSUtils(object):
         sys.exit(1)
 
     @classmethod
-    def get_current_public_ip(cls, interface=None):
+    def get_current_public_ip(cls):
         """
         Get current public IP
 
         @return  IP address or None
         """
-        if not interface:
-            import requests
-            try:
-                ret = requests.get("http://members.3322.org/dyndns/getip")
-            except requests.RequestException as ex:
-                cls.err("network problem:{0}".format(ex))
-                return None
+        try:
+            ret = requests.get("http://members.3322.org/dyndns/getip")
+        except requests.RequestException as ex:
+            cls.err("network problem:{0}".format(ex))
+            return None
 
-            if ret.status_code != requests.codes.ok:
-                cls.err("Failed to get current public IP: {0}\n{1}" \
-                        .format(ret.status_code, ret.content))
-                return None
+        if ret.status_code != requests.codes.ok:
+            cls.err("Failed to get current public IP: {0}\n{1}" \
+                    .format(ret.status_code, ret.content))
+            return None
 
-            return ret.content.decode('utf-8').rstrip("\n")
-        else:
-            return cls.get_interface_address(interface)
+        return ret.content.decode('utf-8').rstrip("\n")
 
     @classmethod
     def get_interface_address(cls, ifname):

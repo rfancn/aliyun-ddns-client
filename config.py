@@ -51,7 +51,6 @@ class DDNSConfig(object):
             self.debug = self.parser.getboolean("DEFAULT", "debug")
             self.access_id = self.parser.get("DEFAULT", "access_id")
             self.access_key = self.parser.get("DEFAULT", "access_key")
-            self.interface = self.parser.get("DEFAULT", "interface", fallback=None)
         except ValueError as ex:
             DDNSUtils.err_and_exit("Invalid debug in config: {0}".format(ex))
         except ConfigParser.NoSectionError as ex:
@@ -61,6 +60,12 @@ class DDNSConfig(object):
 
         if not self.access_id or not self.access_key:
             DDNSUtils.err_and_exit("Invalid access_id or access_key in config file.")
+        
+        if self.parser.has_section("feature_public_ip_from_nic"):
+            self.get_feature_public_ip_from_nic_option()
+        else:
+            self.feature_public_ip_from_nic_enabled = False
+        
 
     def get_domain_record_sections(self):
         """
@@ -68,7 +73,9 @@ class DDNSConfig(object):
 
         :return: section list
         """
-        return self.parser.sections()
+        # filter out feature_sections
+        sections = self.parser.sections()
+        return [ s for s in sections if not s.lower().startswith("feature_") ]
 
     def get_option_value(self, section, option, default=None):
         """
@@ -88,3 +95,25 @@ class DDNSConfig(object):
             print("No option {0} in section: {1}".format(option, section))
 
         return value
+
+    def get_feature_public_ip_from_nic_option(self):
+        """
+        Get options about the getting ip from nic.
+        """
+        section_name = "feature_public_ip_from_nic"
+        try:
+            enable = self.parser.getboolean(section_name, "enable")
+        except ValueError as ex:
+            DDNSUtils.err_and_exit("Invalid 'enable' value in feature public_ip_from_nic config: {0}".format(ex))
+        except ConfigParser.NoOptionError as ex:
+            enable = False
+
+        self.feature_public_ip_from_nic_enabled = enable
+        if enable:
+            try:
+                self.interface = self.parser.get(section_name, "interface")
+            except ConfigParser.NoOptionError as ex:
+                DDNSUtils.err_and_exit("No interface specified")
+
+            if self.interface == "":
+                DDNSUtils.err_and_exit("Empty interface")
