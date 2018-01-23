@@ -156,7 +156,7 @@ class DDNSDomainRecordManager(object):
 
         return remote_record
 
-    def update(self, remote_record, current_public_ip):
+    def update(self, remote_record, current_public_ip, record_type):
         """
         Update RemoteDomainRecord 's value to current public IP on Aliyun server
 
@@ -166,4 +166,5 @@ class DDNSDomainRecordManager(object):
         """
         return self.resolver.update_domain_record(remote_record.recordid,
                                                   rr=remote_record.rr,
-                                                  record_value=current_public_ip)
+                                                  record_value=current_public_ip,
+                                                  record_type=record_type)

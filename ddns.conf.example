@@ -13,8 +13,8 @@ debug=true
 domain=
 # Required: subdomain name, like: *, www, blog, bbs
 sub_domain=
-# Required: resolve type, now it only supports 'A'
-type=A
+# Required: resolve type, like: A, AAAA
+type=
 
 [feature_public_ip_from_nic]
 enable=false

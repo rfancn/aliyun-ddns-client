@@ -22,6 +22,8 @@ from socket import error as socket_error
 import sys
 from datetime import datetime
 import uuid
+import json
+import re
 
 import requests
 
@@ -82,19 +84,50 @@ class DDNSUtils(object):
         return ret.content.decode('utf-8').rstrip("\n")
 
     @classmethod
-    def get_interface_address(cls, ifname):
+    def get_current_public_ipv6(cls):
+        """
+        Get current IPv6 address
+        :return: IPv6 address or None
+        """
+        try:
+            ret = requests.get("http://v6.ip6tools.com/check_ip.php")
+        except requests.RequestException as ex:
+            cls.err("network problem:{0}".format(ex))
+            return None
+        return json.loads(ret.text[1:-1])['addr']
+
+    @classmethod
+    def is_private_address(cls, addr):
+        """
+        Check if the address is private address.
+        :param addr: str
+        :return: bool
+        """
+        priv_lo = re.compile("^127\.\d{1,3}\.\d{1,3}\.\d{1,3}$")
+        priv_24 = re.compile("^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$")
+        priv_20 = re.compile("^192\.168\.\d{1,3}.\d{1,3}$")
+        priv_16 = re.compile("^172.(1[6-9]|2[0-9]|3[0-1]).[0-9]{1,3}.[0-9]{1,3}$")
+        priv_v6 = re.compile("^fe80")
+        return any([priv_16.match(addr), priv_20.match(addr), priv_24.match(addr),
+                    priv_lo.match(addr), priv_v6.match(addr)])
+
+    @classmethod
+    def get_interface_address(cls, ifname, family=socket.AF_INET):
         import netifaces as ni
         try:
-            ip = ni.ifaddresses(ifname)[ni.AF_INET][0]['addr']
-            return ip
+            for addr in ni.ifaddresses(ifname)[family]:
+                ip = addr['addr']
+                if not cls.is_private_address(ip):
+                    return ip
         except KeyError:
             cls.err("Can't find the interface {}".format(ifname))
             return None
 
     @classmethod
-    def get_dns_resolved_ip(cls, subdomain, domainname):
+    def get_dns_resolved_ip(cls, subdomain, domainname, family=socket.AF_INET):
         """
-        Get current IP address resolved by DNS server
+        Get current IP address resolved by DNS server, here we use `getaddrinfo`
+        instead of `gethostbyname` because of the poor ipv6 support of `gethostname`.
 
         :param subdomain:  sub domain
         :param domainname:     domain name
@@ -109,7 +142,7 @@ class DDNSUtils(object):
             else:
                 hostname = "{0}.{1}".format(subdomain, domainname)
 
-            ip_addr = socket.gethostbyname(hostname)
+            ip_addr = socket.getaddrinfo(hostname, 80, family)[0][4][0]
         except socket_error as ex:
             cls.err("DomainRecord[{0}] cannot be resolved because of:{1}" \
                      .format(hostname, ex))

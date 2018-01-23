@@ -9,11 +9,10 @@ If you feels it is helpful, pls support me by clicking AD in websiste [**hdget**
 Python DDNS client for Aliyun(http://www.hdget.com/aliyun-ddns-client)
 
 ### LIMITATION
-This version of DDNS client only supports auto updating 'A' type DomainRecord with IPV4 address.
+This version of DDNS client only supports auto updating 'A' and 'AAAA' type DomainRecord.
 
 Other types are not supported because they need following value format other than IP address:
 - 'NS', 'MX', 'CNAME' types DomainRecord need domain name format value
-- 'AAAA' type DomainRecord need IPV6 address format value
 - 'SRV' type DomainRecord need name.protocal format value
 - 'Explicit URL' and 'Implicit  URL' need URL format value
 
@@ -74,12 +73,12 @@ interval=600
 debug=true
 
 [DomainRecord1]
-# domain name, like google.com
+# Required: domain name, like google.com
 domain=
-# subdomain name, like www, blog, bbs, *, @, ...
+# Required: subdomain name, like: *, www, blog, bbs
 sub_domain=
-# resolve type, 'A', 'AAAA'..., currently it only supports 'A'
-type=A
+# Required: resolve type, like: A, AAAA
+type=
 
 [feature_public_ip_from_nic]
 enable=false

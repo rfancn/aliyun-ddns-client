@@ -20,6 +20,8 @@
 from utils import DDNSUtils
 from config import DDNSConfig
 from record import DDNSDomainRecordManager
+from socket import AF_INET, AF_INET6
+
 
 def main():
     """
@@ -30,19 +32,23 @@ def main():
 
     # get current public ip for this server
     if config.pifn_enable:
-        current_public_ip = DDNSUtils.get_interface_address(config.pifn_interface)
+        current_public_ip = {AF_INET: DDNSUtils.get_interface_address(config.pifn_interface),
+                             AF_INET6: DDNSUtils.get_interface_address(config.pifn_interface, AF_INET6)}
     else:
-        current_public_ip = DDNSUtils.get_current_public_ip()
+        current_public_ip = {AF_INET: DDNSUtils.get_current_public_ip(), AF_INET6: DDNSUtils.get_current_public_ipv6()}
     if not current_public_ip:
         DDNSUtils.err_and_exit("Failed to get current public IP")
+    print(current_public_ip)
 
     for local_record in record_manager.local_record_list:
+        family = AF_INET if local_record.type == 'A' else AF_INET6
         dns_resolved_ip = DDNSUtils.get_dns_resolved_ip(local_record.subdomain,
-                                                        local_record.domainname)
-
-        if current_public_ip == dns_resolved_ip:
+                                                        local_record.domainname,
+                                                        family)
+        print(dns_resolved_ip)
+        if current_public_ip[family] == dns_resolved_ip:
             DDNSUtils.info("Skipped as no changes for DomainRecord" \
-                           "[{rec.subdomain}.{rec.domainname}]".format(rec=local_record))
+                           "[{rec.subdomain}.{rec.domainname}.{rec.type}]".format(rec=local_record))
             continue
 
         # If current public IP doesn't equal to current DNS resolved ip, only in three cases:
@@ -55,19 +61,21 @@ def main():
                           "[{rec.subdomain}.{rec.domainname}]".format(rec=local_record))
             continue
 
-        if current_public_ip == remote_record.value:
+        if current_public_ip[family] == remote_record.value:
             DDNSUtils.info("Skipped as we already updated DomainRecord" \
                            "[{rec.subdomain}.{rec.domainname}]".format(rec=local_record))
             continue
 
         # if we can fetch remote record and record's value doesn't equal to public IP
-        sync_result = record_manager.update(remote_record, current_public_ip)
+        record_type = 'A' if family == AF_INET else 'AAAA'
+        sync_result = record_manager.update(remote_record, current_public_ip[family], record_type)
         if not sync_result:
             DDNSUtils.err("Failed updating DomainRecord" \
                           "[{rec.subdomain}.{rec.domainname}]".format(rec=local_record))
         else:
             DDNSUtils.info("Successfully updated DomainRecord" \
                            "[{rec.subdomain}.{rec.domainname}]".format(rec=local_record))
+
 
 if __name__ == "__main__":
     main()
