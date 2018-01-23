@@ -21,10 +21,12 @@ Other types are not supported because they need following value format other tha
 Some 3rd party python libraries are required for aliyun-ddns-client as below, you can install it via pip or easy_install:
 
 - requests
+- netifaces (needed only when you want to get IP address from the interface setting, it maybe useful when you have multiple interfaces. And if you get ip from the interface, you can ignore the "requests" package.)
 
 For example:
 ```
 # pip install requests
+# pip install netifaces # optional 
 ```
 
 ### INSTALLATION 
@@ -59,6 +61,7 @@ Required options need to be set in /etc/ddns.conf:
 Optional options:
 * type
 * debug
+* interface
 
 ```
 [DEFAULT]
@@ -70,6 +73,9 @@ access_key=
 interval=600
 # turn on debug mode or not
 debug=true
+# Optional: should we get ip from the specific interface instead of getting ip from the web.
+# Require the "netifaces" package. Use "pip install netifaces" to install it.
+# interface=en0
 
 [DomainRecord1]
 # domain name, like google.com

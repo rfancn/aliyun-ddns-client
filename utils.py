@@ -23,7 +23,6 @@ import sys
 from datetime import datetime
 import uuid
 
-import requests
 
 class DDNSUtils(object):
     # To support "*" subdomain definition,
@@ -68,6 +67,7 @@ class DDNSUtils(object):
         @return  IP address or None
         """
         if not interface:
+            import requests
             try:
                 ret = requests.get("http://members.3322.org/dyndns/getip")
             except requests.RequestException as ex:

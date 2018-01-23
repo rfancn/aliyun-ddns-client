@@ -7,6 +7,9 @@ access_key=
 interval=600
 # Optional: turn on debug mode or not
 debug=true
+# Optional: should we get ip from the specific interface
+# Require the "netifaces" package. Use "pip install netifaces" to install it.
+# interface=en0
 
 [DomainRecord1]
 # Required: domain name, like google.com
