@@ -61,24 +61,37 @@ class DDNSUtils(object):
         sys.exit(1)
 
     @classmethod
-    def get_current_public_ip(cls):
+    def get_current_public_ip(cls, interface=None):
         """
         Get current public IP
 
         @return  IP address or None
         """
+        if not interface:
+            try:
+                ret = requests.get("http://members.3322.org/dyndns/getip")
+            except requests.RequestException as ex:
+                cls.err("network problem:{0}".format(ex))
+                return None
+
+            if ret.status_code != requests.codes.ok:
+                cls.err("Failed to get current public IP: {0}\n{1}" \
+                        .format(ret.status_code, ret.content))
+                return None
+
+            return ret.content.decode('utf-8').rstrip("\n")
+        else:
+            return cls.get_interface_address(interface)
+
+    @classmethod
+    def get_interface_address(cls, ifname):
+        import netifaces as ni
         try:
-            ret = requests.get("http://members.3322.org/dyndns/getip")
-        except requests.RequestException as ex:
-            cls.err("network problem:{0}".format(ex))
+            ip = ni.ifaddresses(ifname)[ni.AF_INET][0]['addr']
+            return ip
+        except KeyError:
+            cls.err("Can't find the interface {}".format(ifname))
             return None
-
-        if ret.status_code != requests.codes.ok:
-            cls.err("Failed to get current public IP: {0}\n{1}" \
-                    .format(ret.status_code, ret.content))
-            return None
-
-        return ret.content.decode('utf-8').rstrip("\n")
 
     @classmethod
     def get_dns_resolved_ip(cls, subdomain, domainname):

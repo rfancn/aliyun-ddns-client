@@ -51,6 +51,7 @@ class DDNSConfig(object):
             self.debug = self.parser.getboolean("DEFAULT", "debug")
             self.access_id = self.parser.get("DEFAULT", "access_id")
             self.access_key = self.parser.get("DEFAULT", "access_key")
+            self.interface = self.parser.get("DEFAULT", "interface", fallback=None)
         except ValueError as ex:
             DDNSUtils.err_and_exit("Invalid debug in config: {0}".format(ex))
         except ConfigParser.NoSectionError as ex:

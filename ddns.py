@@ -29,7 +29,7 @@ def main():
     record_manager = DDNSDomainRecordManager(config)
 
     # get current public ip for this server
-    current_public_ip = DDNSUtils.get_current_public_ip()
+    current_public_ip = DDNSUtils.get_current_public_ip(config.interface)
     if not current_public_ip:
         DDNSUtils.err_and_exit("Failed to get current public IP")
 
