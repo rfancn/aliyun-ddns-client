@@ -25,6 +25,7 @@ import uuid
 
 import requests
 
+
 class DDNSUtils(object):
     # To support "*" subdomain definition,
     # We need generate a non-exist subdomain name
@@ -79,6 +80,16 @@ class DDNSUtils(object):
             return None
 
         return ret.content.decode('utf-8').rstrip("\n")
+
+    @classmethod
+    def get_interface_address(cls, ifname):
+        import netifaces as ni
+        try:
+            ip = ni.ifaddresses(ifname)[ni.AF_INET][0]['addr']
+            return ip
+        except KeyError:
+            cls.err("Can't find the interface {}".format(ifname))
+            return None
 
     @classmethod
     def get_dns_resolved_ip(cls, subdomain, domainname):

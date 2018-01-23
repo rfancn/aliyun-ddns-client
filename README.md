@@ -21,10 +21,12 @@ Other types are not supported because they need following value format other tha
 Some 3rd party python libraries are required for aliyun-ddns-client as below, you can install it via pip or easy_install:
 
 - requests
+- netifaces (needed only when you want to get IP address from the interface setting, it maybe useful when you have multiple interfaces.)
 
 For example:
 ```
 # pip install requests
+# pip install netifaces # optional 
 ```
 
 ### INSTALLATION 
@@ -78,13 +80,18 @@ domain=
 sub_domain=
 # resolve type, 'A', 'AAAA'..., currently it only supports 'A'
 type=A
+
+[feature_public_ip_from_nic]
+enable=false
+interface=eth0
 ```
 
 ### GETTING STARTED 
 1. Create a DNS resolve entry in Aliyun console manually, e,g: blog.guanxigo.com
 2. You can leave any IP address on Aliyun server for this entry, like 192.168.0.1
 3. Make sure all required options are inputted correctly in "ddns.conf"
-4. Make sure "ddns.conf" can be readable for the user who setup cron job
+4. Enable the features you want to use.
+5. Make sure "ddns.conf" can be readable for the user who setup cron job
 
 NOTICE:
 Only domain records both defined in local config file and Aliyun server will be updated

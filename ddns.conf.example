@@ -15,3 +15,7 @@ domain=
 sub_domain=
 # Required: resolve type, now it only supports 'A'
 type=A
+
+[feature_public_ip_from_nic]
+enable=false
+interface=eth0
