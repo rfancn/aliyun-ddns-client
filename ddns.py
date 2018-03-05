@@ -38,14 +38,12 @@ def main():
         current_public_ip = {AF_INET: DDNSUtils.get_current_public_ip(), AF_INET6: DDNSUtils.get_current_public_ipv6()}
     if not current_public_ip:
         DDNSUtils.err_and_exit("Failed to get current public IP")
-    print(current_public_ip)
 
     for local_record in record_manager.local_record_list:
         family = AF_INET if local_record.type == 'A' else AF_INET6
         dns_resolved_ip = DDNSUtils.get_dns_resolved_ip(local_record.subdomain,
                                                         local_record.domainname,
                                                         family)
-        print(dns_resolved_ip)
         if current_public_ip[family] == dns_resolved_ip:
             DDNSUtils.info("Skipped as no changes for DomainRecord" \
                            "[{rec.subdomain}.{rec.domainname}.{rec.type}]".format(rec=local_record))
