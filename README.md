@@ -76,7 +76,7 @@ domain=
 sub_domain=
 # Required: resolve type, like: A, AAAA
 type=
-# Not Required: interface you want to bind
+# Not Required: Interface will be used to get the IP address.
 # interface=eth0
 ```
 
