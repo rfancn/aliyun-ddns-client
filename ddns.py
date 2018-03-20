@@ -2,6 +2,7 @@
 # coding=utf-8
 """
  Copyright (C) 2010-2013, Ryan Fan
+ Modified by Guorui Yu.
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -30,17 +31,21 @@ def main():
     config = DDNSConfig()
     record_manager = DDNSDomainRecordManager(config)
 
-    # get current public ip for this server
-    if config.pifn_enable:
-        current_public_ip = {AF_INET: DDNSUtils.get_interface_address(config.pifn_interface),
-                             AF_INET6: DDNSUtils.get_interface_address(config.pifn_interface, AF_INET6)}
-    else:
-        current_public_ip = {AF_INET: DDNSUtils.get_current_public_ip(), AF_INET6: DDNSUtils.get_current_public_ipv6()}
-    if not current_public_ip:
-        DDNSUtils.err_and_exit("Failed to get current public IP")
-
     for local_record in record_manager.local_record_list:
         family = AF_INET if local_record.type == 'A' else AF_INET6
+        interface = local_record.interface
+        if interface is None:
+            current_public_ip = {AF_INET: DDNSUtils.get_current_public_ip(),
+                                 AF_INET6: DDNSUtils.get_current_public_ipv6()}
+        else:
+            current_public_ip = {AF_INET: DDNSUtils.get_interface_address(interface),
+                                 AF_INET6: DDNSUtils.get_interface_address(interface, AF_INET6)}
+
+        if not current_public_ip:
+            DDNSUtils.info(
+                "Unable to get current IP for [{rec.subdomain}.{rec.domainname}.{rec.type}]".format(rec=local_record))
+            continue
+
         dns_resolved_ip = DDNSUtils.get_dns_resolved_ip(local_record.subdomain,
                                                         local_record.domainname,
                                                         family)

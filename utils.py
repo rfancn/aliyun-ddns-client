@@ -2,6 +2,7 @@
 # coding=utf-8
 """
  Copyright (C) 2010-2013, Ryan Fan <reg_info@126.com>
+ Modified by Guorui Yu.
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by

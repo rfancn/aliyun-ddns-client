@@ -1,3 +1,10 @@
+## [v0.35](#) (2018-3-20)
+
+### Added
+
+- 'AAAA' record support.
+- Multiple interfaces support.
+
 ## [v0.3](#) (2017-11-09)
 
 ### Enhancement 

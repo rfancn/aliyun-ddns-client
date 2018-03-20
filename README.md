@@ -1,15 +1,11 @@
-# 写在前面的话
+## aliyun-ddns-client(v0.35)
 
-如果大家觉得还好用的话，有时间可以去[**hdget**](http://www.hdget.com)帮忙点击下广告支持服务器运营, 以便后续提供更好的支持。有时候我们一个微小不经意的举动，却是最好的肯定与支持，先谢谢了!
+Python DDNS client for Aliyun.
 
-If you feels it is helpful, pls support me by clicking AD in websiste [**hdget**](http://www.hdget.com) if you have free time, thanks in advance!
-
-## aliyun-ddns-client(v0.3)
-
-Python DDNS client for Aliyun(http://www.hdget.com/aliyun-ddns-client)
+Forked from [vcancy/aliyun-ddns-client](https://github.com/vcancy/aliyun-ddns-client), but with some new features. For example, the 'AAAA' record support and multiple interfaces support.
 
 ### LIMITATION
-This version of DDNS client only supports auto updating 'A' and 'AAAA' type DomainRecord.
+This version of DDNS client supports auto updating 'A' and 'AAAA' type DomainRecord.
 
 Other types are not supported because they need following value format other than IP address:
 - 'NS', 'MX', 'CNAME' types DomainRecord need domain name format value
@@ -34,16 +30,16 @@ For example:
 1. Download all files to somewhere, e,g: /opt/aliyun-ddns-client
 2. Rename "ddns.conf.example" to "ddns.conf" in the same dir
 3. Create a cronjob which execute "python ddns.py" periodly, e,g:
-`
-*/5 * * * * cd /opt/aliyun-ddns-client && /usr/bin/python ddns.py
-`
+  `
+  */5 * * * * cd /opt/aliyun-ddns-client && /usr/bin/python ddns.py
+  `
 4. Make sure ddns.conf can be accessed by cronjob user
 
 #### 2. USE SYSTEMD
 1. Download all files to some where, e,g:/root/tools/aliyun-ddns-client
 2. Rename "ddns.conf.example" to "ddns.conf" in the same dir
 3. Copy two files: "ddns.timer" and "ddns.service" to "/usr/lib/systemd/system"
-4. 
+4. ​
 ```
  root@local# systemctl daemon-reload
  root@local# systemctl start ddns.timer
@@ -60,6 +56,7 @@ Required options need to be set in /etc/ddns.conf:
 Optional options:
 * type
 * debug
+* interface
 
 ```
 [DEFAULT]
@@ -79,21 +76,18 @@ domain=
 sub_domain=
 # Required: resolve type, like: A, AAAA
 type=
-
-[feature_public_ip_from_nic]
-enable=false
-interface=eth0
+# Not Required: interface you want to bind
+# interface=eth0
 ```
 
 ### GETTING STARTED 
 1. Create a DNS resolve entry in Aliyun console manually, e,g: blog.guanxigo.com
 2. You can leave any IP address on Aliyun server for this entry, like 192.168.0.1
 3. Make sure all required options are inputted correctly in "ddns.conf"
-4. Enable the features you want to use.
-5. Make sure "ddns.conf" can be readable for the user who setup cron job
+4. Make sure "ddns.conf" can be readable for the user who setup cron job
 
 NOTICE:
-Only domain records both defined in local config file and Aliyun server will be updated
+Only domain records both defined in local config file and Aliyun server will be updated, so if you want to add a new domain records, please to add the domain records in the Aliyun console website.
 
 ### FAQ
 
@@ -104,9 +98,9 @@ Only domain records both defined in local config file and Aliyun server will be 
 * Q: Why it failed with error message "Failed to save the config value"?
 
   A: You need make sure current cronjob user has permission to write file /etc/ddns.conf.
-  
+
 * Q: Why it raise exception "AttributeError: 'X509' object has no attribute '_x509'"?
-  
+
   A: PyOpenSSL version need >= 0.14, and you may try to fix this problem by do following:
   ```
   sudo yum uninstall python-requests
