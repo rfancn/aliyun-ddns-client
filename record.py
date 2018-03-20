@@ -2,6 +2,7 @@
 # coding=utf-8
 """
  Copyright (C) 2010-2013, Ryan Fan
+ Modified by Guorui Yu.
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -41,6 +42,7 @@ class LocalDomainRecord(object):# pylint: disable=too-few-public-methods
         self.domainname = config.get_option_value(section, "domain")
         self.rr = self.subdomain = config.get_option_value(section, "sub_domain")
         self.type = config.get_option_value(section, "type", default="A")
+        self.interface = config.get_option_value(section, "interface", default=None)
 
         if not self.domainname:
             raise ValueError("Failed initializing LocalDomainRecord: " \
