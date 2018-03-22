@@ -91,11 +91,11 @@ class DDNSUtils(object):
         :return: IPv6 address or None
         """
         try:
-            ret = requests.get("http://v6.ip6tools.com/check_ip.php")
+            ret = requests.get("http://v6.ipv6-test.com/api/myip.php")
         except requests.RequestException as ex:
             cls.err("network problem:{0}".format(ex))
             return None
-        return json.loads(ret.text[1:-1])['addr']
+        return ret.text
 
     @classmethod
     def is_private_address(cls, addr):
