@@ -72,7 +72,7 @@ class DDNSUtils(object):
         @return  IP address or None
         """
         try:
-            ret = requests.get("http://members.3322.org/dyndns/getip")
+            ret = requests.get("http://httpbin.org/ip")
         except requests.RequestException as ex:
             cls.err("network problem:{0}".format(ex))
             return None
@@ -82,7 +82,7 @@ class DDNSUtils(object):
                     .format(ret.status_code, ret.content))
             return None
 
-        return ret.content.decode('utf-8').rstrip("\n")
+        return ret.json()['origin']
 
     @classmethod
     def get_current_public_ipv6(cls):
