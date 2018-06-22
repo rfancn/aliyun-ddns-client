@@ -166,4 +166,4 @@ class DDNSDomainRecordManager(object):
         """
         return self.resolver.update_domain_record(remote_record.recordid,
                                                   rr=remote_record.rr,
-                                                  record_value=current_public_ip)
+                                                  record_value=current_public_ip,ttl=self.config.get_option_value(section, "interval"))
