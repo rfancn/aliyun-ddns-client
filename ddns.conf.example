@@ -16,6 +16,17 @@ sub_domain=
 # Required: resolve type, now it only supports 'A'
 type=A
 
+#[DomainRecord2]
+# Required: domain name, like google.com
+#domain=
+# Required: subdomain name, like: *, www, blog, bbs
+#sub_domain=
+# Required: resolve IPV6 address
+#type=AAAA
+# Option: Deafult Interface is eno1
+#interface=eth0
+
+
 [feature_public_ip_from_nic]
 enable=false
 interface=eth0
