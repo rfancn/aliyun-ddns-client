@@ -41,6 +41,7 @@ class LocalDomainRecord(object):# pylint: disable=too-few-public-methods
         self.domainname = config.get_option_value(section, "domain")
         self.rr = self.subdomain = config.get_option_value(section, "sub_domain")
         self.type = config.get_option_value(section, "type", default="A")
+        self.interface = config.get_option_value(section, "interface", default="eno1")
 
         if not self.domainname:
             raise ValueError("Failed initializing LocalDomainRecord: " \
@@ -156,7 +157,7 @@ class DDNSDomainRecordManager(object):
 
         return remote_record
 
-    def update(self, remote_record, current_public_ip):
+    def update(self, remote_record, current_public_ip,record_type='A'):
         """
         Update RemoteDomainRecord 's value to current public IP on Aliyun server
 
@@ -166,4 +167,6 @@ class DDNSDomainRecordManager(object):
         """
         return self.resolver.update_domain_record(remote_record.recordid,
                                                   rr=remote_record.rr,
-                                                  record_value=current_public_ip)
+                                                  record_value=current_public_ip,
+                                                  record_type=record_type
+                                                  )
