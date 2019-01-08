@@ -92,6 +92,16 @@ class DDNSUtils(object):
             return None
 
     @classmethod
+    def get_interface_ipv6_address(cls, ifname):
+        import netifaces as ni
+        try:
+            ip = ni.ifaddresses(ifname)[ni.AF_INET6][0]['addr']
+            return ip
+        except KeyError:
+            cls.err("Can't find the interface {}".format(ifname))
+            return None
+
+    @classmethod
     def get_dns_resolved_ip(cls, subdomain, domainname):
         """
         Get current IP address resolved by DNS server
