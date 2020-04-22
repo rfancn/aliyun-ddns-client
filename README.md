@@ -29,7 +29,11 @@ For example:
 # pip install netifaces # optional 
 ```
 
-### INSTALLATION 
+### INSTALLATION
+
+#### 0. BY PIP
+
+`pip3 install -U git+https://github.com/TsingJyujing/aliyun-ddns-client.git`
 
 #### 1. USE CRONJOB
 1. Download all files to somewhere, e,g: /opt/aliyun-ddns-client

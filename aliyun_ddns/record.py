@@ -18,18 +18,22 @@
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 """
 import sys
+
 if sys.version_info < (3,):
     import string
+
+
     def lower_func(s):
         return string.lower(s)
 else:
     def lower_func(s):
         return str.lower(s)
 
-from utils import DDNSUtils
-from yunresolver import YunResolver
+from aliyun_ddns.utils import DDNSUtils
+from aliyun_ddns.yunresolver import YunResolver
 
-class LocalDomainRecord(object):# pylint: disable=too-few-public-methods
+
+class LocalDomainRecord(object):  # pylint: disable=too-few-public-methods
     """
     Local domain record created from config file
     """
@@ -53,12 +57,14 @@ class LocalDomainRecord(object):# pylint: disable=too-few-public-methods
 
         if self.type.upper() not in self.VALID_TYPES:
             raise ValueError("Failed initializing LocalDomainRecord: " \
-                            "Invalid type in config file.")
+                             "Invalid type in config file.")
 
-class RemoteDomainRecord(object):# pylint: disable=too-many-instance-attributes, too-few-public-methods
+
+class RemoteDomainRecord(object):  # pylint: disable=too-many-instance-attributes, too-few-public-methods
     """
     Remote domain record created from Aliyun server
     """
+
     def __init__(self, domain_record_info):
         self.domainname = None
         self.recordid = None
@@ -83,6 +89,7 @@ class DDNSDomainRecordManager(object):
     """
     Manager class used to manage local domain record and remote domain records
     """
+
     def __init__(self, config):
         self.config = config
         self.resolver = YunResolver(self.config.access_id, self.config.access_key, self.config.debug)
@@ -120,7 +127,6 @@ class DDNSDomainRecordManager(object):
 
         return None
 
-
     def fetch_remote_record(self, local_record):
         """
         Fetch RemoteDomainReord from Aliyun server by using LocalDomainRecord info
@@ -157,7 +163,7 @@ class DDNSDomainRecordManager(object):
 
         return remote_record
 
-    def update(self, remote_record, current_public_ip,record_type='A'):
+    def update(self, remote_record, current_public_ip, record_type='A'):
         """
         Update RemoteDomainRecord 's value to current public IP on Aliyun server
 

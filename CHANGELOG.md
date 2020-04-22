@@ -1,3 +1,6 @@
+## [0.4](#) (2020-04-22)
+- Added setup.py for easier to install
+
 ## [v0.3](#) (2017-11-09)
 
 ### Enhancement 

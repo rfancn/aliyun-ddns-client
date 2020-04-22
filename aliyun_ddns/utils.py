@@ -18,10 +18,10 @@
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 """
 import socket
-from socket import error as socket_error
 import sys
-from datetime import datetime
 import uuid
+from datetime import datetime
+from socket import error as socket_error
 
 import requests
 
@@ -30,12 +30,13 @@ class DDNSUtils(object):
     # To support "*" subdomain definition,
     # We need generate a non-exist subdomain name
     # Here we generate a random UUID for that
-    #fake_subdomain = ''.join([random.choice(string.lowercase) for i in xrange(12)])
-    RANDOM_UUID = uuid.uuid4().hex 
+    # fake_subdomain = ''.join([random.choice(string.lowercase) for i in xrange(12)])
+    RANDOM_UUID = uuid.uuid4().hex
 
     """
     Utils class wrapper
     """
+
     @staticmethod
     def err(msg):
         """
@@ -113,7 +114,7 @@ class DDNSUtils(object):
         ip_addr = None
         try:
             if subdomain == "@":
-                hostname = domainname 
+                hostname = domainname
             elif subdomain == "*":
                 hostname = "{0}.{1}".format(cls.RANDOM_UUID, domainname)
             else:
@@ -122,7 +123,7 @@ class DDNSUtils(object):
             ip_addr = socket.gethostbyname(hostname)
         except socket_error as ex:
             cls.err("DomainRecord[{0}] cannot be resolved because of:{1}" \
-                     .format(hostname, ex))
+                    .format(hostname, ex))
 
         return ip_addr
 
