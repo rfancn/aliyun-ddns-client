@@ -23,7 +23,7 @@ setup(
     include_package_data=True,
     entry_points={
         'console_scripts': [
-            'aliyun-ddns=aliyun_ddns.ddns.main',
+            'aliyun-ddns=aliyun_ddns.ddns:main',
         ],
     },
 )
