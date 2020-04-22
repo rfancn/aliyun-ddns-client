@@ -70,7 +70,7 @@ class DDNSUtils(object):
         @return  IP address or None
         """
         try:
-            ret = requests.get("")
+            ret = requests.get("https://jsonip.com/")
         except requests.RequestException as ex:
             cls.err("network problem:{0}".format(ex))
             return None
