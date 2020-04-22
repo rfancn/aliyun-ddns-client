@@ -18,22 +18,26 @@
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 """
 from __future__ import print_function
+
 import sys
+
 if sys.version_info < (3,):
     import ConfigParser
 else:
     import configparser as ConfigParser
 
-from utils import DDNSUtils
+from aliyun_ddns.utils import DDNSUtils
 
 CONF_FILE = "ddns.conf"
 # Compaitible consideration for v0.1
 SYS_CONF_FILE = "/etc/ddns.conf"
 
+
 class DDNSConfig(object):
     """
     Aliyun DDNS client config class to read/save config stuff
     """
+
     def __init__(self):
         # default options
         self.debug = False
@@ -60,12 +64,11 @@ class DDNSConfig(object):
 
         if not self.access_id or not self.access_key:
             DDNSUtils.err_and_exit("Invalid access_id or access_key in config file.")
-        
+
         if self.parser.has_section("feature_public_ip_from_nic"):
             self.get_feature_public_ip_from_nic_options()
         else:
             self.pifn_enable = False
-        
 
     def get_domain_record_sections(self):
         """
@@ -75,7 +78,7 @@ class DDNSConfig(object):
         """
         # filter out feature_sections
         sections = self.parser.sections()
-        return [ s for s in sections if not s.lower().startswith("feature_") ]
+        return [s for s in sections if not s.lower().startswith("feature_")]
 
     def get_option_value(self, section, option, default=None):
         """

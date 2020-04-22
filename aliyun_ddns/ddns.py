@@ -17,9 +17,10 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 """
-from utils import DDNSUtils
-from config import DDNSConfig
-from record import DDNSDomainRecordManager
+from aliyun_ddns.config import DDNSConfig
+from aliyun_ddns.record import DDNSDomainRecordManager
+from aliyun_ddns.utils import DDNSUtils
+
 
 def main():
     """
@@ -39,8 +40,8 @@ def main():
     for local_record in record_manager.local_record_list:
         dns_resolved_ip = DDNSUtils.get_dns_resolved_ip(local_record.subdomain,
                                                         local_record.domainname)
-        
-        if local_record.type=="AAAA":
+
+        if local_record.type == "AAAA":
             current_ip = DDNSUtils.get_interface_ipv6_address(local_record.interface)
         else:
             current_ip = current_public_ip
@@ -66,14 +67,11 @@ def main():
             continue
 
         # if we can fetch remote record and record's value doesn't equal to public IP
-        sync_result = record_manager.update(remote_record, current_ip,local_record.type)
-        
+        sync_result = record_manager.update(remote_record, current_ip, local_record.type)
+
         if not sync_result:
             DDNSUtils.err("Failed updating DomainRecord" \
                           "[{rec.subdomain}.{rec.domainname}]".format(rec=local_record))
         else:
             DDNSUtils.info("Successfully updated DomainRecord" \
                            "[{rec.subdomain}.{rec.domainname}]".format(rec=local_record))
-
-if __name__ == "__main__":
-    main()
