@@ -180,7 +180,7 @@ class YunResolver(object):
 
         optional_params = {}
         if ttl:
-            valid_ttl_list = [600, 1800, 3600, 43200, 86400]
+            valid_ttl_list = [1, 5, 10, 60, 120, 600, 1800, 3600, 43200, 86400]
             if ttl not in valid_ttl_list:
                 print("Invalid TTL, it need to be one of them: %s" % valid_ttl_list)
                 return False
