@@ -7,6 +7,9 @@ access_key=
 interval=600
 # Optional: turn on debug mode or not
 debug=true
+#server chan SCKEY http://sc.ftqq.com/
+open_serverchan = false
+serverchan_sckey =
 
 [DomainRecord1]
 # Required: domain name, like google.com

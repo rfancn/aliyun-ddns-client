@@ -58,6 +58,7 @@ def main():
         if not remote_record:
             DDNSUtils.err("Failed finding remote DomainRecord" \
                           "[{rec.subdomain}.{rec.domainname}]".format(rec=local_record))
+            DDNSUtils.push_serverchan_msg(config.open_serverchan,config.serverchan_sckey,"更新DNS失败:外网IP[{remote}]".format(remote=remote_record.value))
             continue
 
         if current_ip == remote_record.value:
@@ -71,9 +72,12 @@ def main():
         if not sync_result:
             DDNSUtils.err("Failed updating DomainRecord" \
                           "[{rec.subdomain}.{rec.domainname}]".format(rec=local_record))
+            DDNSUtils.push_serverchan_msg(config.open_serverchan,config.serverchan_sckey,"更新DNS失败:" \
+                          "[{rec.subdomain}.{rec.domainname}],外网IP[{remote}]".format(rec=local_record,remote=remote_record.value))
         else:
             DDNSUtils.info("Successfully updated DomainRecord" \
                            "[{rec.subdomain}.{rec.domainname}]".format(rec=local_record))
+            DDNSUtils.push_serverchan_msg(config.open_serverchan,config.serverchan_sckey,msg = "外网IP:[{}]".format(remote_record.value),title="IP变动")
 
 if __name__ == "__main__":
     main()

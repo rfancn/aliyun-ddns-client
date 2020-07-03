@@ -134,3 +134,15 @@ class DDNSUtils(object):
         :return: timestamp string
         """
         return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    @staticmethod
+    def push_serverchan_msg(open,sckey,msg,title='DDNS'):
+        """
+        Push msg to server chan
+        :param msg:
+        :return:
+        """
+        if open:
+            requests.get('https://sc.ftqq.com/{}.send?text={}&desp={}'.format(sckey,title,msg))
+        else:
+            sys.stderr.write("{0}\t[INFO]\tserver chan closed.\n".format(DDNSUtils.get_current_time()))
