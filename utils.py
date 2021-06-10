@@ -95,8 +95,12 @@ class DDNSUtils(object):
     def get_interface_ipv6_address(cls, ifname):
         import netifaces as ni
         try:
-            ip = ni.ifaddresses(ifname)[ni.AF_INET6][0]['addr']
-            return ip
+            for ifcfg in ni.ifaddresses(ifname)[ni.AF_INET6]:
+                ip = ifcfg['addr']
+                if ip[:4] != 'fe80':
+                    return ip
+            cls.err("Can't get ipv6 address from the interface {}".format(ifname))
+            return None
         except KeyError:
             cls.err("Can't find the interface {}".format(ifname))
             return None
