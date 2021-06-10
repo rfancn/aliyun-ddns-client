@@ -123,7 +123,10 @@ class DDNSUtils(object):
             else:
                 hostname = "{0}.{1}".format(subdomain, domainname)
 
-            ip_addr = socket.gethostbyname(hostname)
+            try:
+                ip_addr = socket.gethostbyname(hostname)
+            except socket_error as ex:
+                ip_addr = socket.getaddrinfo(hostname, None, socket.AF_INET6)[0][4][0]
         except socket_error as ex:
             cls.err("DomainRecord[{0}] cannot be resolved because of:{1}" \
                      .format(hostname, ex))
