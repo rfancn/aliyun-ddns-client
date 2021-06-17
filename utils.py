@@ -71,11 +71,11 @@ class DDNSUtils(object):
         try:
             ret = requests.get("http://members.3322.org/dyndns/getip")
         except requests.RequestException as ex:
-            cls.err("network problem:{0}".format(ex))
+            print("network problem:{0}".format(ex))
             return None
 
         if ret.status_code != requests.codes.ok:
-            cls.err("Failed to get current public IP: {0}\n{1}" \
+            print("Failed to get current public IP: {0}\n{1}" \
                     .format(ret.status_code, ret.content))
             return None
 
