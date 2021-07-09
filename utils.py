@@ -71,11 +71,11 @@ class DDNSUtils(object):
         try:
             ret = requests.get("http://members.3322.org/dyndns/getip")
         except requests.RequestException as ex:
-            cls.err("network problem:{0}".format(ex))
+            print("network problem:{0}".format(ex))
             return None
 
         if ret.status_code != requests.codes.ok:
-            cls.err("Failed to get current public IP: {0}\n{1}" \
+            print("Failed to get current public IP: {0}\n{1}" \
                     .format(ret.status_code, ret.content))
             return None
 
@@ -95,8 +95,12 @@ class DDNSUtils(object):
     def get_interface_ipv6_address(cls, ifname):
         import netifaces as ni
         try:
-            ip = ni.ifaddresses(ifname)[ni.AF_INET6][0]['addr']
-            return ip
+            for ifcfg in ni.ifaddresses(ifname)[ni.AF_INET6]:
+                ip = ifcfg['addr']
+                if ip[:4] != 'fe80':
+                    return ip
+            cls.err("Can't get ipv6 address from the interface {}".format(ifname))
+            return None
         except KeyError:
             cls.err("Can't find the interface {}".format(ifname))
             return None
@@ -119,7 +123,10 @@ class DDNSUtils(object):
             else:
                 hostname = "{0}.{1}".format(subdomain, domainname)
 
-            ip_addr = socket.gethostbyname(hostname)
+            try:
+                ip_addr = socket.gethostbyname(hostname)
+            except socket_error as ex:
+                ip_addr = socket.getaddrinfo(hostname, None, socket.AF_INET6)[0][4][0]
         except socket_error as ex:
             cls.err("DomainRecord[{0}] cannot be resolved because of:{1}" \
                      .format(hostname, ex))

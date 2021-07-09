@@ -34,6 +34,9 @@ def main():
     else:
         current_public_ip = DDNSUtils.get_current_public_ip()
     if not current_public_ip:
+        import sys
+        print('Failed to get current public IP')
+        sys.exit()
         DDNSUtils.err_and_exit("Failed to get current public IP")
 
     for local_record in record_manager.local_record_list:
