@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # coding=utf-8
+
 """
  Copyright (C) 2010-2013, Ryan Fan <reg_info@126.com>
 
@@ -17,11 +18,12 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 """
+
 import socket
-from socket import error as socket_error
 import sys
-from datetime import datetime
 import uuid
+from datetime import datetime
+from socket import error as socket_error
 
 import requests
 

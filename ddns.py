@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # coding=utf-8
+
 """
  Copyright (C) 2010-2013, Ryan Fan
 
@@ -17,9 +18,11 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 """
-from utils import DDNSUtils
+
 from config import DDNSConfig
 from record import DDNSDomainRecordManager
+from utils import DDNSUtils
+
 
 def main():
     """
@@ -39,14 +42,14 @@ def main():
     for local_record in record_manager.local_record_list:
         dns_resolved_ip = DDNSUtils.get_dns_resolved_ip(local_record.subdomain,
                                                         local_record.domainname)
-        
-        if local_record.type=="AAAA":
+
+        if local_record.type == "AAAA":
             current_ip = DDNSUtils.get_interface_ipv6_address(local_record.interface)
         else:
             current_ip = current_public_ip
 
         if current_ip == dns_resolved_ip:
-            DDNSUtils.info("Skipped as no changes for DomainRecord" \
+            DDNSUtils.info("Skipped as no changes for DomainRecord"
                            "[{rec.subdomain}.{rec.domainname}]".format(rec=local_record))
             continue
 
@@ -56,24 +59,25 @@ def main():
         # 3. current public IP is changed
         remote_record = record_manager.fetch_remote_record(local_record)
         if not remote_record:
-            DDNSUtils.err("Failed finding remote DomainRecord" \
+            DDNSUtils.err("Failed finding remote DomainRecord"
                           "[{rec.subdomain}.{rec.domainname}]".format(rec=local_record))
             continue
 
         if current_ip == remote_record.value:
-            DDNSUtils.info("Skipped as we already updated DomainRecord" \
+            DDNSUtils.info("Skipped as we already updated DomainRecord"
                            "[{rec.subdomain}.{rec.domainname}]".format(rec=local_record))
             continue
 
         # if we can fetch remote record and record's value doesn't equal to public IP
-        sync_result = record_manager.update(remote_record, current_ip,local_record.type)
-        
+        sync_result = record_manager.update(remote_record, current_ip, local_record.type)
+
         if not sync_result:
-            DDNSUtils.err("Failed updating DomainRecord" \
+            DDNSUtils.err("Failed updating DomainRecord"
                           "[{rec.subdomain}.{rec.domainname}]".format(rec=local_record))
         else:
-            DDNSUtils.info("Successfully updated DomainRecord" \
+            DDNSUtils.info("Successfully updated DomainRecord"
                            "[{rec.subdomain}.{rec.domainname}]".format(rec=local_record))
+
 
 if __name__ == "__main__":
     main()
