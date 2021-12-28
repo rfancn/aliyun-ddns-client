@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # coding=utf-8
+
 """
  Copyright (C) 2010-2013, Ryan Fan <reg_info@126.com>
 
@@ -17,24 +18,29 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 """
+
 from __future__ import print_function
+
 import sys
+
 if sys.version_info < (3,):
-    from urllib import urlencode, quote_plus 
+    from urllib import quote_plus, urlencode
 else:
     from urllib.parse import urlencode, quote_plus
 
-import hmac
 import hashlib
+import hmac
 import uuid
 from datetime import datetime
 
 import requests
 
+
 class YunResolver(object):
     """
     Implementation of Aliyun Resolver API
     """
+
     def __init__(self, access_id, access_key, debug):
         self.url = "https://dns.aliyuncs.com/"
         self.access_id = access_id
@@ -82,7 +88,7 @@ class YunResolver(object):
                 return hash_value.encode('base64').strip('\n')
             else:
                 from base64 import b64encode
-                key = bytes(key, 'utf-8') 
+                key = bytes(key, 'utf-8')
                 str_to_sign = bytes(str_to_sign, 'utf-8')
                 byte_hash_value = hmac.new(key, str_to_sign, hashlib.sha1).digest()
                 return str(b64encode(byte_hash_value), 'utf8').strip('\n')
@@ -93,7 +99,7 @@ class YunResolver(object):
         sign_str = http_method + "&" + quote_plus("/") + "&" + quote_plus(canon_str)
 
         # hmac sha1 algrithm
-        signature = sha1_hmac(self.hash_key, sign_str) 
+        signature = sha1_hmac(self.hash_key, sign_str)
 
         return signature
 
@@ -134,9 +140,9 @@ class YunResolver(object):
         if ret.status_code != requests.codes.ok:
             print("Server side problem: {0}".format(ret.status_code))
             if self.debug:
-                print("Error in describeDomainRecords(), " \
-                       "params: {0},\nhttp response: {1}" \
-                       .format(params, ret.content))
+                print("Error in describeDomainRecords(), "
+                      "params: {0},\nhttp response: {1}"
+                      .format(params, ret.content))
             return None
 
         domain_record_list = []
@@ -214,9 +220,9 @@ class YunResolver(object):
         if ret.status_code != requests.codes.ok:
             print("Server side problem: {0}".format(ret.status_code))
             if self.debug:
-                print("Error in updateDomainRecord(), " \
-                       "params: {0},\nhttp response: {1}" \
-                       .format(params, ret.content))
+                print("Error in updateDomainRecord(), "
+                      "params: {0},\nhttp response: {1}"
+                      .format(params, ret.content))
             return False
 
         return True
@@ -245,9 +251,9 @@ class YunResolver(object):
         if ret.status_code != requests.codes.ok:
             print("Server side problem: {0}".format(ret.status_code))
             if self.debug:
-                print("Error in describeDomainRecordInfo(), " \
-                       "params: {0},\nhttp response: {1}" \
-                       .format(params, ret.content))
+                print("Error in describeDomainRecordInfo(), "
+                      "params: {0},\nhttp response: {1}"
+                      .format(params, ret.content))
             return False
 
         return ret.json()

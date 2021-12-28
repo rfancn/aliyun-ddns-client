@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # coding=utf-8
+
 """
  Copyright (C) 2010-2013, Ryan Fan
 
@@ -17,7 +18,9 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 """
+
 import sys
+
 if sys.version_info < (3,):
     import string
     def lower_func(s):
@@ -28,6 +31,7 @@ else:
 
 from utils import DDNSUtils
 from yunresolver import YunResolver
+
 
 class LocalDomainRecord(object):# pylint: disable=too-few-public-methods
     """
@@ -168,5 +172,4 @@ class DDNSDomainRecordManager(object):
         return self.resolver.update_domain_record(remote_record.recordid,
                                                   rr=remote_record.rr,
                                                   record_value=current_public_ip,
-                                                  record_type=record_type
-                                                  )
+                                                  record_type=record_type)
