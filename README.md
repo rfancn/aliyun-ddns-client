@@ -2,6 +2,8 @@
 
 Python DDNS client for Aliyun (<http://www.hdget.com/aliyun-ddns-client>)
 
+[中文](README.zh.md) | English
+
 ## LIMITATION
 
 This version of DDNS client only supports auto updating 'A' type DomainRecord with IPV4 address.
