@@ -17,16 +17,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 """
-from __future__ import print_function
 
-import sys
-
-if sys.version_info < (3,):
-    import ConfigParser
-else:
-    import configparser as ConfigParser
-
-from aliyun_ddns.utils import DDNSUtils
+import configparser as ConfigParser
 
 CONF_FILE = "ddns.conf"
 # Compaitible consideration for v0.1
@@ -47,23 +39,16 @@ class DDNSConfig(object):
 
         self.parser = ConfigParser.ConfigParser()
         if not self.parser.read(CONF_FILE):
-            # Compaitible consideration for v0.1
+            # Compatible consideration for v0.1
             if not self.parser.read(SYS_CONF_FILE):
-                DDNSUtils.err_and_exit("Failed to read config file.")
+                raise Exception("Failed to read config file.")
 
-        try:
-            self.debug = self.parser.getboolean("DEFAULT", "debug")
-            self.access_id = self.parser.get("DEFAULT", "access_id")
-            self.access_key = self.parser.get("DEFAULT", "access_key")
-        except ValueError as ex:
-            DDNSUtils.err_and_exit("Invalid debug in config: {0}".format(ex))
-        except ConfigParser.NoSectionError as ex:
-            DDNSUtils.err_and_exit("Invalid config: {0}".format(ex))
-        except ConfigParser.NoOptionError as ex:
-            DDNSUtils.err_and_exit("Invalid config: {0}".format(ex))
+        self.debug = self.parser.getboolean("DEFAULT", "debug")
+        self.access_id = self.parser.get("DEFAULT", "access_id")
+        self.access_key = self.parser.get("DEFAULT", "access_key")
 
         if not self.access_id or not self.access_key:
-            DDNSUtils.err_and_exit("Invalid access_id or access_key in config file.")
+            raise Exception("Both access_id or access_key are required in config file.")
 
         if self.parser.has_section("feature_public_ip_from_nic"):
             self.get_feature_public_ip_from_nic_options()
@@ -107,7 +92,7 @@ class DDNSConfig(object):
         try:
             enable = self.parser.getboolean(section_name, "enable")
         except ValueError as ex:
-            DDNSUtils.err_and_exit("Invalid 'enable' value in feature public_ip_from_nic config: {0}".format(ex))
+            raise Exception("Invalid 'enable' value in feature public_ip_from_nic config: {0}".format(ex))
         except ConfigParser.NoOptionError as ex:
             enable = False
 
@@ -116,7 +101,7 @@ class DDNSConfig(object):
             try:
                 self.pifn_interface = self.parser.get(section_name, "interface")
             except ConfigParser.NoOptionError as ex:
-                DDNSUtils.err_and_exit("No interface specified")
+                raise Exception("No interface specified")
 
             if self.pifn_interface == "":
-                DDNSUtils.err_and_exit("Empty interface")
+                raise Exception("Empty interface")

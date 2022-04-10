@@ -17,9 +17,14 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 """
+import logging
+
 from aliyun_ddns.config import DDNSConfig
 from aliyun_ddns.record import DDNSDomainRecordManager
 from aliyun_ddns.utils import DDNSUtils
+
+log = logging.getLogger(__file__)
+logging.basicConfig(level=logging.INFO)
 
 
 def main():
@@ -35,11 +40,13 @@ def main():
     else:
         current_public_ip = DDNSUtils.get_current_public_ip()
     if not current_public_ip:
-        DDNSUtils.err_and_exit("Failed to get current public IP")
+        raise Exception("Failed to get current public IP")
 
     for local_record in record_manager.local_record_list:
-        dns_resolved_ip = DDNSUtils.get_dns_resolved_ip(local_record.subdomain,
-                                                        local_record.domainname)
+        dns_resolved_ip = DDNSUtils.get_dns_resolved_ip(
+            local_record.subdomain,
+            local_record.domainname
+        )
 
         if local_record.type == "AAAA":
             current_ip = DDNSUtils.get_interface_ipv6_address(local_record.interface)
@@ -47,8 +54,7 @@ def main():
             current_ip = current_public_ip
 
         if current_ip == dns_resolved_ip:
-            DDNSUtils.info("Skipped as no changes for DomainRecord" \
-                           "[{rec.subdomain}.{rec.domainname}]".format(rec=local_record))
+            log.info(f"Skipped as no changes for DomainRecord [{local_record.subdomain}.{local_record.domainname}]")
             continue
 
         # If current public IP doesn't equal to current DNS resolved ip, only in three cases:
@@ -57,21 +63,17 @@ def main():
         # 3. current public IP is changed
         remote_record = record_manager.fetch_remote_record(local_record)
         if not remote_record:
-            DDNSUtils.err("Failed finding remote DomainRecord" \
-                          "[{rec.subdomain}.{rec.domainname}]".format(rec=local_record))
+            log.error(f"Failed finding remote DomainRecord [{local_record.subdomain}.{local_record.domainname}]")
             continue
 
         if current_ip == remote_record.value:
-            DDNSUtils.info("Skipped as we already updated DomainRecord" \
-                           "[{rec.subdomain}.{rec.domainname}]".format(rec=local_record))
+            log.info(f"Skipped as we already updated DomainRecord [{local_record.subdomain}.{local_record.domainname}]")
             continue
 
         # if we can fetch remote record and record's value doesn't equal to public IP
         sync_result = record_manager.update(remote_record, current_ip, local_record.type)
 
         if not sync_result:
-            DDNSUtils.err("Failed updating DomainRecord" \
-                          "[{rec.subdomain}.{rec.domainname}]".format(rec=local_record))
+            log.error(f"Failed updating DomainRecord [{local_record.subdomain}.{local_record.domainname}]")
         else:
-            DDNSUtils.info("Successfully updated DomainRecord" \
-                           "[{rec.subdomain}.{rec.domainname}]".format(rec=local_record))
+            log.info(f"Successfully updated DomainRecord [{local_record.subdomain}.{local_record.domainname}]")

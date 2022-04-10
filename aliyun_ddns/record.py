@@ -17,20 +17,12 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 """
-import sys
-
-if sys.version_info < (3,):
-    import string
-
-
-    def lower_func(s):
-        return string.lower(s)
-else:
-    def lower_func(s):
-        return str.lower(s)
+import logging
 
 from aliyun_ddns.utils import DDNSUtils
 from aliyun_ddns.yunresolver import YunResolver
+
+log = logging.getLogger(__file__)
 
 
 class LocalDomainRecord(object):  # pylint: disable=too-few-public-methods
@@ -48,15 +40,15 @@ class LocalDomainRecord(object):  # pylint: disable=too-few-public-methods
         self.interface = config.get_option_value(section, "interface", default="eno1")
 
         if not self.domainname:
-            raise ValueError("Failed initializing LocalDomainRecord: " \
+            raise ValueError("Failed initializing LocalDomainRecord: "
                              "Invalid domain in config file.")
 
         if not self.rr:
-            raise ValueError("Failed initializing LocalDomainRecord: " \
+            raise ValueError("Failed initializing LocalDomainRecord: "
                              "Invalid sub_domain in config file.")
 
         if self.type.upper() not in self.VALID_TYPES:
-            raise ValueError("Failed initializing LocalDomainRecord: " \
+            raise ValueError("Failed initializing LocalDomainRecord: "
                              "Invalid type in config file.")
 
 
@@ -78,8 +70,7 @@ class RemoteDomainRecord(object):  # pylint: disable=too-many-instance-attribute
         self.locked = False
 
         # convert json record key name to lowercased one
-        converted_domain_record_info = dict(zip(map(lower_func, domain_record_info.keys()),
-                                                domain_record_info.values()))
+        converted_domain_record_info = dict(zip(map(str.lower, domain_record_info.keys()), domain_record_info.values()))
 
         for k in converted_domain_record_info.keys():
             self.__dict__[k] = converted_domain_record_info[k]
@@ -139,7 +130,7 @@ class DDNSDomainRecordManager(object):
                                                                    rr_keyword=local_record.rr,
                                                                    type_keyword=local_record.type)
         if not fuzzy_matched_list:
-            DDNSUtils.err("Failed to fetch remote DomainRecords.")
+            log.error("Failed to fetch remote DomainRecords.")
             return None
 
         exact_matched_list = []
@@ -152,7 +143,7 @@ class DDNSDomainRecordManager(object):
             return None
 
         if len(exact_matched_list) > 1:
-            DDNSUtils.err("Duplicate DomainRecord in Aliyun: {rec.subdomain}.{rec.domainname}"
+            log.error("Duplicate DomainRecord in Aliyun: {rec.subdomain}.{rec.domainname}"
                           .format(rec=local_record))
             return None
 

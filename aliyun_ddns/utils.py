@@ -17,13 +17,15 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 """
+import logging
 import socket
-import sys
 import uuid
 from datetime import datetime
 from socket import error as socket_error
 
 import requests
+
+log = logging.getLogger(__file__)
 
 
 class DDNSUtils(object):
@@ -37,31 +39,6 @@ class DDNSUtils(object):
     Utils class wrapper
     """
 
-    @staticmethod
-    def err(msg):
-        """
-        Output error message
-        :param msg: Message to be displayed
-        """
-        sys.stderr.write("{0}\t[ERROR]\t{1}\n".format(DDNSUtils.get_current_time(), msg))
-
-    @staticmethod
-    def info(msg):
-        """
-        Output informative message
-        :param msg: Message to be displayed
-        """
-        sys.stdout.write("{0}\t[INFO]\t{1}\n".format(DDNSUtils.get_current_time(), msg))
-
-    @staticmethod
-    def err_and_exit(msg):
-        """
-        Output error message and exit
-        :param msg: Message to be displayed
-        """
-        sys.stderr.write("{0}\t[ERROR]\t{1}\n".format(DDNSUtils.get_current_time(), msg))
-        sys.exit(1)
-
     @classmethod
     def get_current_public_ip(cls):
         """
@@ -69,38 +46,19 @@ class DDNSUtils(object):
 
         @return  IP address or None
         """
-        try:
-            ret = requests.get("https://jsonip.com/")
-        except requests.RequestException as ex:
-            cls.err("network problem:{0}".format(ex))
-            return None
-
-        if ret.status_code != requests.codes.ok:
-            cls.err("Failed to get current public IP: {0}\n{1}" \
-                    .format(ret.status_code, ret.content))
-            return None
-
-        return ret.json()["ip"]
+        resp = requests.get("https://jsonip.com/")
+        resp.raise_for_status()
+        return resp.json()["ip"]
 
     @classmethod
     def get_interface_address(cls, ifname):
         import netifaces as ni
-        try:
-            ip = ni.ifaddresses(ifname)[ni.AF_INET][0]['addr']
-            return ip
-        except KeyError:
-            cls.err("Can't find the interface {}".format(ifname))
-            return None
+        return ni.ifaddresses(ifname)[ni.AF_INET][0]['addr']
 
     @classmethod
     def get_interface_ipv6_address(cls, ifname):
         import netifaces as ni
-        try:
-            ip = ni.ifaddresses(ifname)[ni.AF_INET6][0]['addr']
-            return ip
-        except KeyError:
-            cls.err("Can't find the interface {}".format(ifname))
-            return None
+        return ni.ifaddresses(ifname)[ni.AF_INET6][0]['addr']
 
     @classmethod
     def get_dns_resolved_ip(cls, subdomain, domainname):
@@ -112,6 +70,7 @@ class DDNSUtils(object):
         :return:  IP address or None
         """
         ip_addr = None
+        hostname = None
         try:
             if subdomain == "@":
                 hostname = domainname
@@ -122,8 +81,7 @@ class DDNSUtils(object):
 
             ip_addr = socket.gethostbyname(hostname)
         except socket_error as ex:
-            cls.err("DomainRecord[{0}] cannot be resolved because of:{1}" \
-                    .format(hostname, ex))
+            log.error(f"DomainRecord[{hostname}] cannot be resolved because of:{ex}")
 
         return ip_addr
 
