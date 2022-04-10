@@ -54,11 +54,12 @@ docker run -it --rm -v $YOUR_CONF_FILE_PATH:/etc/ddns.conf tsingjyujing/aliyun-d
 You can install/update the command line tool from PIP:
 
 ```shell
+pip3 install -U aliyun-ddns-client
+# You can also install from github if you want
 pip3 install -U git+https://github.com/TsingJyujing/aliyun-ddns-client.git
 ```
 
 Save your config file to `$(pwd)/ddns.conf` or `/etc/ddns.conf`, and run `aliyun-ddns` directly.
-
 
 ## Limitations
 
