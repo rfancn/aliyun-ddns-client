@@ -16,6 +16,7 @@ setup(
     install_requires=[
         "requests",
     ],
+    long_description_content_type="text/markdown",
     long_description=README,
     packages=find_packages(),
     platforms='any',
