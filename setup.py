@@ -10,9 +10,9 @@ except:
     README = ""
 
 setup(
-    name="aliyun-ddns",
-    version=0.4,
-    description="DDNS for aliyun",
+    name="aliyun-ddns-client",
+    version="0.4",
+    description="DDNS client for aliyun",
     install_requires=[
         "requests",
     ],
