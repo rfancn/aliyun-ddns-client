@@ -43,6 +43,7 @@ For example:
  root@local# systemctl daemon-reload
  root@local# systemctl start ddns.timer
  root@local# systemctl status ddns.timer -l
+ root@local# systemctl enable ddns.timer
 ```
 
 ### CONFIGURATION
